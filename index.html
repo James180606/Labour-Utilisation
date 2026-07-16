@@ -27,8 +27,9 @@ body { font-family: 'Segoe UI', sans-serif; background: #f3f2f1; color: #252423;
   padding: 7px 14px; border: 1px solid #ccc; border-radius: 4px;
   background: white; cursor: pointer;
 }
-.toolbar select#siteSelect { min-width: 240px; }
-.toolbar select#weekSelect { min-width: 160px; }
+.toolbar select#siteSelect  { min-width: 240px; }
+.toolbar select#monthSelect { min-width: 130px; }
+.toolbar select#weekSelect  { min-width: 160px; }
 .toolbar select:focus { outline: 2px solid #0078d4; }
 .toolbar .meta { font-size: 12px; color: #999; margin-left: auto; }
 
@@ -57,7 +58,6 @@ body { font-family: 'Segoe UI', sans-serif; background: #f3f2f1; color: #252423;
 .card-title span { font-size: 11px; font-weight: 400; color: #888; margin-left: 6px; }
 .chart-wrap { position: relative; }
 
-.row-2 { display: grid; grid-template-columns: 2fr 1fr; gap: 14px; margin-bottom: 20px; }
 
 /* WOW CARDS */
 .wow-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; margin-bottom: 20px; }
@@ -118,6 +118,14 @@ tfoot td:first-child { text-align: left; }
     <option value="Northside Electrical Contractors">Admin / Office</option>
     <option value="Punt Road Oval">Punt Road Oval</option>
     <option value="Stacked Farm">Stacked Farm</option>
+  </select>
+  <label>Month</label>
+  <select id="monthSelect" onchange="onMonthChange()">
+    <option value="all">All Months</option>
+    <option value="Apr">April 2026</option>
+    <option value="May">May 2026</option>
+    <option value="Jun">June 2026</option>
+    <option value="Jul">July 2026</option>
   </select>
   <label>Week Ending</label>
   <select id="weekSelect" onchange="onWeekChange()">
@@ -198,16 +206,10 @@ tfoot td:first-child { text-align: left; }
     </div>
   </div>
 
-  <!-- HOURLY RATE + SITE TABLE -->
-  <div class="row-2">
-    <div class="card" style="margin-bottom:0">
-      <div class="card-title" id="rateChartTitle">Average Hourly Rate by Site <span>weighted avg · all weeks with cost data</span></div>
-      <div class="chart-wrap" style="height:320px"><canvas id="rateChart"></canvas></div>
-    </div>
-    <div class="card" style="margin-bottom:0">
-      <div class="card-title" id="pieChartTitle">Hours by Site <span id="pieChartSubtitle">week ending Sun 12 Jul</span></div>
-      <div class="chart-wrap" style="height:320px"><canvas id="currentPieChart"></canvas></div>
-    </div>
+  <!-- HOURLY RATE CHART -->
+  <div class="card">
+    <div class="card-title" id="rateChartTitle">Average Hourly Rate by Site <span>weighted avg · all weeks with cost data</span></div>
+    <div class="chart-wrap" style="height:320px"><canvas id="rateChart"></canvas></div>
   </div>
 
   <!-- FULL SITE TABLE -->
@@ -353,18 +355,41 @@ function getPrvIdx() { const ci = getCurIdx(); return ci > 0 ? ci - 1 : null; }
 function getSiteKey() { return $('siteSelect').value; }
 
 // ──────────────────────────────────────────────
-// POPULATE WEEK DROPDOWN
+// MONTH GROUPINGS
 // ──────────────────────────────────────────────
-(function populateWeekSelect() {
+// Each week label ends with a month abbreviation
+const weekMonth = weeks.map(w => w.split(' ')[1]); // ["Apr","Apr",...,"Jul","Jul"]
+
+function getMonthFilter() { return $('monthSelect').value; }
+
+function visibleWeekIndices() {
+  const m = getMonthFilter();
+  return weeks.map((_,i) => i).filter(i => m === 'all' || weekMonth[i] === m);
+}
+
+// ──────────────────────────────────────────────
+// POPULATE / REFRESH WEEK DROPDOWN
+// ──────────────────────────────────────────────
+function populateWeekSelect(keepValue) {
   const sel = $('weekSelect');
-  weeks.forEach((w, i) => {
+  const prev = keepValue !== undefined ? keepValue : parseInt(sel.value, 10);
+  sel.innerHTML = '';
+  const visible = visibleWeekIndices();
+  visible.forEach(i => {
     const opt = document.createElement('option');
     opt.value = i;
-    opt.textContent = 'Sun ' + w;
+    opt.textContent = 'Sun ' + weeks[i];
     sel.appendChild(opt);
   });
-  sel.value = W - 1; // default to most recent week
-})();
+  // Restore previous selection if still visible, else pick last in range
+  if (visible.includes(prev)) {
+    sel.value = prev;
+  } else {
+    sel.value = visible[visible.length - 1];
+  }
+}
+
+populateWeekSelect(W - 1); // init: default to most recent week
 
 // ──────────────────────────────────────────────
 // SITE COLORS
@@ -395,30 +420,39 @@ function buildWeeklyChart(siteKey) {
 
   const cur = getCurIdx();
   const ctx = $('weeklyChart').getContext('2d');
-  let data, label, color;
+  let fullData, label, color;
 
   if (siteKey === 'all') {
-    data  = fleetHours;
+    fullData = fleetHours;
     label = 'Fleet Total Hours';
     color = '#0078d4';
-    $('weeklyChartTitle').innerHTML = 'Weekly Labour Hours — All Sites (Fleet Total) <span>5 Apr – 12 Jul 2026 · week ending Sunday</span>';
   } else {
-    data  = raw[siteKey].h;
+    fullData = raw[siteKey].h;
     label = displayName(siteKey);
     color = siteColors[siteKey] || '#0078d4';
-    $('weeklyChartTitle').innerHTML = `Weekly Labour Hours — ${displayName(siteKey)} <span>5 Apr – 12 Jul 2026 · week ending Sunday</span>`;
   }
 
-  const bgColors = data.map((_, i) => i === cur ? color : color + '66');
-  const borders  = data.map((_, i) => i === cur ? color : color + '99');
+  // Filter to visible weeks for the selected month
+  const vis = visibleWeekIndices();
+  const chartLabels = vis.map(i => weeks[i]);
+  const chartData   = vis.map(i => fullData[i]);
+
+  const monthFilter = getMonthFilter();
+  const rangeStr = monthFilter === 'all' ? '5 Apr – 12 Jul 2026' :
+    `${weeks[vis[0]]} – ${weeks[vis[vis.length-1]]} 2026`;
+  const siteStr = siteKey === 'all' ? 'All Sites (Fleet Total)' : displayName(siteKey);
+  $('weeklyChartTitle').innerHTML = `Weekly Labour Hours — ${siteStr} <span>${rangeStr} · week ending Sunday</span>`;
+
+  const bgColors = chartData.map((_, j) => vis[j] === cur ? color : color + '66');
+  const borders  = chartData.map((_, j) => vis[j] === cur ? color : color + '99');
 
   weeklyChart = new Chart(ctx, {
     type: 'bar',
     data: {
-      labels: weeks,
+      labels: chartLabels,
       datasets: [{
         label,
-        data,
+        data: chartData,
         backgroundColor: bgColors,
         borderColor: borders,
         borderWidth: 1,
@@ -432,7 +466,7 @@ function buildWeeklyChart(siteKey) {
         tooltip: {
           callbacks: {
             label: c => {
-              const i = c.dataIndex;
+              const i = vis[c.dataIndex]; // map back to original week index
               const h = c.raw;
               const cost = siteKey === 'all' ? fleetCost[i] : raw[siteKey].c[i];
               const rate = cost > 0 && h > 0 ? (cost/h).toFixed(2) : '—';
@@ -497,62 +531,6 @@ function buildRateChart(siteKey) {
         x: { min: 50, ticks: { callback: v => '$' + v, font: { size: 10 } }, grid: { color: '#f0f0f0' } },
         y: { ticks: { font: { size: 11 } } }
       }
-    }
-  });
-}
-
-// ──────────────────────────────────────────────
-// CURRENT WEEK PIE CHART (rebuildable)
-// ──────────────────────────────────────────────
-let pieChart = null;
-
-function buildPieChart(siteKey) {
-  if (pieChart) { pieChart.destroy(); pieChart = null; }
-
-  const cur = getCurIdx();
-  const weekLabel = 'Sun ' + weeks[cur];
-  $('pieChartSubtitle').textContent = 'week ending ' + weekLabel;
-
-  let labels, data, colors, tooltipFn;
-  const totalFleet = fleetHours[cur];
-
-  if (siteKey === 'all') {
-    $('pieChartTitle').innerHTML = `Hours by Site <span id="pieChartSubtitle">week ending ${weekLabel}</span>`;
-    const entries = siteNames
-      .map(k => ({ name: displayName(k), h: raw[k].h[cur], color: siteColors[k] || '#888' }))
-      .filter(r => r.h > 0)
-      .sort((a,b) => b.h - a.h);
-    labels = entries.map(r => r.name);
-    data   = entries.map(r => r.h);
-    colors = entries.map(r => r.color);
-    tooltipFn = c => ` ${fH(c.raw)} hrs (${totalFleet > 0 ? ((c.raw/totalFleet)*100).toFixed(1) : '0'}%)`;
-  } else {
-    $('pieChartTitle').innerHTML = `Hours by Site <span id="pieChartSubtitle">week ending ${weekLabel}</span>`;
-    const siteH  = raw[siteKey].h[cur];
-    const otherH = Math.max(0, totalFleet - siteH);
-    labels = [displayName(siteKey), 'Other Sites'];
-    data   = [siteH, otherH];
-    colors = [siteColors[siteKey] || '#0078d4', '#e0e0e0'];
-    tooltipFn = c => ` ${fH(c.raw)} hrs (${totalFleet > 0 ? ((c.raw/totalFleet)*100).toFixed(1) : '0'}%)`;
-  }
-
-  pieChart = new Chart($('currentPieChart').getContext('2d'), {
-    type: 'doughnut',
-    data: {
-      labels,
-      datasets: [{
-        data,
-        backgroundColor: colors,
-        borderWidth: 2, borderColor: '#fff'
-      }]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: {
-        legend: { position: 'bottom', labels: { font: { size: 10 }, padding: 8, boxWidth: 10 } },
-        tooltip: { callbacks: { label: tooltipFn } }
-      },
-      cutout: '55%'
     }
   });
 }
@@ -711,7 +689,6 @@ function rebuildAll() {
 
   buildWeeklyChart(site);
   buildRateChart(site);
-  buildPieChart(site);
   buildTable(site);
   updateKpis(site);
 
@@ -730,6 +707,10 @@ function rebuildAll() {
 // ──────────────────────────────────────────────
 function onSiteChange() { rebuildAll(); }
 function onWeekChange() { rebuildAll(); }
+function onMonthChange() {
+  populateWeekSelect(); // refresh week options for this month
+  rebuildAll();
+}
 
 // ── Init ──
 rebuildAll();

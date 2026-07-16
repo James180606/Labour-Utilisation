@@ -10,134 +10,72 @@
 body { font-family: 'Segoe UI', sans-serif; background: #f3f2f1; color: #252423; }
 
 .header {
-  background: #1a1a2e;
-  color: white;
-  padding: 16px 28px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  background: #1a1a2e; color: white;
+  padding: 16px 28px; display: flex; align-items: center; justify-content: space-between;
 }
 .header h1 { font-size: 18px; font-weight: 600; letter-spacing: 0.3px; }
 .header .subtitle { font-size: 12px; color: #aaa; margin-top: 2px; }
-.header .date-badge {
-  background: #e8b84b;
-  color: #1a1a2e;
-  padding: 4px 12px;
-  border-radius: 12px;
-  font-size: 12px;
-  font-weight: 600;
-}
+.date-badge { background: #e8b84b; color: #1a1a2e; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600; }
 
 .toolbar {
-  background: white;
-  border-bottom: 1px solid #e0e0e0;
-  padding: 12px 28px;
-  display: flex;
-  align-items: center;
-  gap: 20px;
+  background: white; border-bottom: 1px solid #e0e0e0;
+  padding: 12px 28px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
 }
-.toolbar label { font-size: 11px; font-weight: 700; color: #666; text-transform: uppercase; letter-spacing: 0.5px; }
+.toolbar label { font-size: 11px; font-weight: 700; color: #555; text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; }
 .toolbar select {
-  font-size: 13px;
-  font-family: 'Segoe UI', sans-serif;
-  padding: 7px 14px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  background: white;
-  color: #252423;
-  min-width: 240px;
-  cursor: pointer;
+  font-size: 13px; font-family: 'Segoe UI', sans-serif;
+  padding: 7px 14px; border: 1px solid #ccc; border-radius: 4px;
+  background: white; cursor: pointer;
 }
-.toolbar select:focus { outline: 2px solid #0078d4; border-color: #0078d4; }
+.toolbar select#siteSelect { min-width: 240px; }
+.toolbar select#weekSelect { min-width: 160px; }
+.toolbar select:focus { outline: 2px solid #0078d4; }
 .toolbar .meta { font-size: 12px; color: #999; margin-left: auto; }
 
 .dashboard { padding: 20px 24px; }
 
-/* KPI CARDS */
 .kpi-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; margin-bottom: 20px; }
-.kpi-card {
-  background: white;
-  border-radius: 6px;
-  padding: 18px 20px;
-  border-left: 4px solid #ccc;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
-}
+.kpi-card { background: white; border-radius: 6px; padding: 16px 18px; border-left: 4px solid #ccc; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+.kpi-card.dark  { border-left-color: #1a1a2e; }
 .kpi-card.blue  { border-left-color: #0078d4; }
 .kpi-card.green { border-left-color: #107c10; }
 .kpi-card.amber { border-left-color: #e8b84b; }
 .kpi-card.red   { border-left-color: #d13438; }
-.kpi-card.dark  { border-left-color: #1a1a2e; }
-.kpi-label { font-size: 11px; text-transform: uppercase; color: #666; letter-spacing: 0.5px; font-weight: 600; }
-.kpi-value { font-size: 26px; font-weight: 700; margin-top: 6px; color: #1a1a2e; }
+.kpi-label { font-size: 10px; text-transform: uppercase; color: #666; letter-spacing: 0.5px; font-weight: 700; }
+.kpi-value { font-size: 26px; font-weight: 700; margin-top: 5px; color: #1a1a2e; }
 .kpi-card.blue  .kpi-value { color: #0078d4; }
 .kpi-card.green .kpi-value { color: #107c10; }
 .kpi-card.amber .kpi-value { color: #b88a00; }
 .kpi-card.red   .kpi-value { color: #d13438; }
-.kpi-sub { font-size: 11px; color: #999; margin-top: 4px; }
+.kpi-sub { font-size: 11px; color: #999; margin-top: 3px; }
 
-/* SITE DETAIL PANEL */
-.site-panel {
-  display: none;
-  background: white;
-  border-radius: 6px;
-  padding: 20px 24px;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
-  margin-bottom: 20px;
-  border-top: 4px solid #0078d4;
-}
-.site-panel.visible { display: block; }
-.site-panel-header { display: flex; align-items: baseline; gap: 12px; margin-bottom: 18px; border-bottom: 2px solid #f3f2f1; padding-bottom: 12px; }
-.site-panel-title { font-size: 16px; font-weight: 700; color: #1a1a2e; }
-.site-panel-sub { font-size: 12px; color: #888; }
-.site-metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
-.sm-label { font-size: 10px; text-transform: uppercase; color: #888; letter-spacing: 0.5px; font-weight: 700; margin-bottom: 5px; }
-.sm-value { font-size: 24px; font-weight: 700; color: #1a1a2e; }
-.sm-sub { font-size: 11px; color: #aaa; margin-top: 3px; }
-.bar-wrap { margin-top: 7px; background: #f0f0f0; border-radius: 4px; height: 5px; overflow: hidden; }
-.bar-fill { height: 100%; border-radius: 4px; transition: width 0.4s ease; }
-
-/* WOW SECTION */
-.section-label {
-  font-size: 12px; font-weight: 600; color: #666;
-  text-transform: uppercase; letter-spacing: 0.5px;
-  margin-bottom: 10px;
-}
+.section-label { font-size: 11px; font-weight: 700; color: #666; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; }
 .section-label span { font-size: 11px; font-weight: 400; text-transform: none; letter-spacing: 0; color: #aaa; }
-.wow-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; margin-bottom: 20px; }
-.wow-card {
-  background: white; border-radius: 6px; padding: 16px;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.08); text-align: center;
-}
-.wow-label { font-size: 10px; text-transform: uppercase; color: #888; letter-spacing: 0.4px; font-weight: 600; margin-bottom: 8px; }
-.wow-prev { font-size: 11px; color: #bbb; margin-bottom: 2px; }
-.wow-curr { font-size: 18px; font-weight: 700; color: #1a1a2e; }
-.wow-delta { font-size: 13px; font-weight: 700; margin-top: 6px; }
-.wow-delta.neg-good { color: #107c10; }
-.wow-delta.neg-bad  { color: #d13438; }
-.wow-delta.pos-bad  { color: #d13438; }
-.wow-delta.neutral  { color: #888; }
 
-/* CARDS */
-.card {
-  background: white; border-radius: 6px; padding: 18px 20px;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
-}
-.card-title {
-  font-size: 13px; font-weight: 700; color: #252423;
-  margin-bottom: 16px; border-bottom: 2px solid #f3f2f1; padding-bottom: 10px;
-}
+.card { background: white; border-radius: 6px; padding: 18px 20px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); margin-bottom: 20px; }
+.card-title { font-size: 13px; font-weight: 700; color: #252423; margin-bottom: 14px; border-bottom: 2px solid #f3f2f1; padding-bottom: 10px; }
 .card-title span { font-size: 11px; font-weight: 400; color: #888; margin-left: 6px; }
 .chart-wrap { position: relative; }
-.row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 20px; }
+
+.row-2 { display: grid; grid-template-columns: 2fr 1fr; gap: 14px; margin-bottom: 20px; }
+
+/* WOW CARDS */
+.wow-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; margin-bottom: 20px; }
+.wow-card { background: white; border-radius: 6px; padding: 14px 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); text-align: center; }
+.wow-label { font-size: 10px; text-transform: uppercase; color: #888; letter-spacing: 0.4px; font-weight: 600; margin-bottom: 6px; }
+.wow-prev { font-size: 11px; color: #ccc; margin-bottom: 2px; }
+.wow-curr { font-size: 18px; font-weight: 700; color: #1a1a2e; }
+.wow-delta { font-size: 12px; font-weight: 700; margin-top: 5px; }
+.neg-good { color: #107c10; }
+.pos-bad  { color: #d13438; }
+.neg-bad  { color: #d13438; }
+.pos-good { color: #107c10; }
+.neutral  { color: #888; }
 
 /* TABLE */
 .table-wrap { overflow-x: auto; }
 table { width: 100%; border-collapse: collapse; font-size: 12px; }
-thead th {
-  background: #1a1a2e; color: white; padding: 9px 12px;
-  text-align: right; font-weight: 600; font-size: 11px;
-  letter-spacing: 0.3px; white-space: nowrap;
-}
+thead th { background: #1a1a2e; color: white; padding: 9px 12px; text-align: right; font-weight: 600; font-size: 11px; white-space: nowrap; }
 thead th:first-child { text-align: left; }
 tbody tr:nth-child(even) { background: #fafafa; }
 tbody tr:hover { background: #f0f6ff; }
@@ -146,12 +84,11 @@ td { padding: 7px 12px; text-align: right; border-bottom: 1px solid #f0f0f0; }
 td:first-child { text-align: left; color: #1a1a2e; font-weight: 500; }
 tfoot td { font-weight: 700; background: #1a1a2e; color: white; padding: 9px 12px; }
 tfoot td:first-child { text-align: left; }
-
-.badge-red   { background: #fde8e8; color: #d13438; font-size: 9px; font-weight: 700; padding: 2px 5px; border-radius: 3px; margin-left: 5px; }
-.badge-amber { background: #fff3e0; color: #b88a00; font-size: 9px; font-weight: 700; padding: 2px 5px; border-radius: 3px; margin-left: 5px; }
 .cell-zero { color: #ccc; }
+.badge-red   { background: #fde8e8; color: #d13438; font-size: 9px; font-weight: 700; padding: 2px 5px; border-radius: 3px; margin-left: 5px; white-space: nowrap; }
+.badge-green { background: #e8f5e9; color: #107c10; font-size: 9px; font-weight: 700; padding: 2px 5px; border-radius: 3px; margin-left: 5px; white-space: nowrap; }
 
-.footer { text-align: center; font-size: 11px; color: #aaa; padding: 14px; margin-top: 8px; }
+.footer { text-align: center; font-size: 11px; color: #aaa; padding: 14px; margin-top: 4px; }
 </style>
 </head>
 <body>
@@ -159,187 +96,148 @@ tfoot td:first-child { text-align: left; }
 <div class="header">
   <div>
     <h1>Labour Utilisation Dashboard</h1>
-    <div class="subtitle">Northside Electrical Contractors &nbsp;|&nbsp; Source: Weekly Workforce &amp; Payroll Dashboard</div>
+    <div class="subtitle">Northside Electrical Contractors &nbsp;|&nbsp; Source: Timesheet Export &nbsp;|&nbsp; 5 Apr – 12 Jul 2026</div>
   </div>
-  <div class="date-badge">Week ending Sun 05 Jul 2026</div>
+  <div class="date-badge" id="headerBadge">Week ending Sun 12 Jul 2026</div>
 </div>
 
 <div class="toolbar">
   <label>View Site</label>
-  <select id="siteSelect" onchange="filterSite()">
-    <option value="all">All Sites</option>
-    <option value="0">Aston Craigieburn</option>
-    <option value="1">BMEP - Ballarat</option>
-    <option value="2">Fountain Gate Super Centre</option>
-    <option value="3">Kennards Brunswick</option>
-    <option value="4">Kennards Craigieburn</option>
-    <option value="5">Kennards Cranbourne</option>
-    <option value="6">Kennards Roxburgh Park</option>
-    <option value="7">Kingston Aquatic Centre</option>
-    <option value="8">NTS Loan Labour</option>
-    <option value="9">Admin / Office</option>
-    <option value="10">General Services</option>
-    <option value="11">Punt Road Oval</option>
-    <option value="12">Stacked Farm</option>
+  <select id="siteSelect" onchange="onSiteChange()">
+    <option value="all">All Sites (Fleet Total)</option>
+    <option value="Aston Craigieburn">Aston Craigieburn</option>
+    <option value="BMEP - Ballarat">BMEP - Ballarat</option>
+    <option value="Fountain Gate Super Centre">Fountain Gate Super Centre</option>
+    <option value="Kennards Brunswick">Kennards Brunswick</option>
+    <option value="Kennards Craigieburn">Kennards Craigieburn</option>
+    <option value="Kennards Cranbourne">Kennards Cranbourne</option>
+    <option value="Kennards Roxburgh Park">Kennards Roxburgh Park</option>
+    <option value="Kingston Aquatic Centre">Kingston Aquatic Centre</option>
+    <option value="Mecwacare Ballan">Mecwacare Ballan</option>
+    <option value="NTS Loan Labour">NTS Loan Labour</option>
+    <option value="Northside Electrical Contractors">Admin / Office</option>
+    <option value="Punt Road Oval">Punt Road Oval</option>
+    <option value="Stacked Farm">Stacked Farm</option>
   </select>
-  <span class="meta">Payroll period: 29 Jun – 05 Jul 2026 &nbsp;·&nbsp; 73 employees paid</span>
+  <label>Week Ending</label>
+  <select id="weekSelect" onchange="onWeekChange()">
+    <!-- populated by JS -->
+  </select>
+  <span class="meta" id="toolbarMeta">15 weeks of data · 13 sites · costs from timesheet export</span>
 </div>
 
 <div class="dashboard">
 
-  <!-- KPI SUMMARY -->
+  <!-- KPI CARDS -->
   <div class="kpi-row">
     <div class="kpi-card dark">
-      <div class="kpi-label">Total Hours</div>
-      <div class="kpi-value" id="kpi-hours">2,656.5</div>
-      <div class="kpi-sub" id="kpi-hours-sub">all sites · week ending Sun</div>
-    </div>
-    <div class="kpi-card green">
-      <div class="kpi-label">Ordinary Hours</div>
-      <div class="kpi-value" id="kpi-ord">2,385.0</div>
-      <div class="kpi-sub" id="kpi-ord-sub">89.8% of total hours</div>
-    </div>
-    <div class="kpi-card red">
-      <div class="kpi-label">Overtime Hours</div>
-      <div class="kpi-value" id="kpi-ot">271.5</div>
-      <div class="kpi-sub" id="kpi-ot-sub">10.2% OT rate</div>
+      <div class="kpi-label">Hours (Selected Week)</div>
+      <div class="kpi-value" id="kpi-hours">—</div>
+      <div class="kpi-sub" id="kpi-hours-sub">loading…</div>
     </div>
     <div class="kpi-card blue">
-      <div class="kpi-label">Direct Labour Cost</div>
-      <div class="kpi-value" id="kpi-cost">$186K</div>
-      <div class="kpi-sub" id="kpi-cost-sub">site labour · all locations</div>
+      <div class="kpi-label">Employees on Site</div>
+      <div class="kpi-value" id="kpi-emps">—</div>
+      <div class="kpi-sub" id="kpi-emps-sub">selected week</div>
+    </div>
+    <div class="kpi-card green">
+      <div class="kpi-label">Labour Cost</div>
+      <div class="kpi-value" id="kpi-cost">—</div>
+      <div class="kpi-sub" id="kpi-cost-sub">selected week</div>
     </div>
     <div class="kpi-card amber">
-      <div class="kpi-label">OT Cost</div>
-      <div class="kpi-value" id="kpi-ot-cost">$34,773</div>
-      <div class="kpi-sub" id="kpi-ot-cost-sub">18.7% of labour cost</div>
+      <div class="kpi-label">Avg Hourly Rate</div>
+      <div class="kpi-value" id="kpi-rate">—</div>
+      <div class="kpi-sub" id="kpi-rate-sub">selected week</div>
+    </div>
+    <div class="kpi-card red">
+      <div class="kpi-label">WoW Hours Change</div>
+      <div class="kpi-value" id="kpi-wow">—</div>
+      <div class="kpi-sub" id="kpi-wow-sub">vs previous week</div>
     </div>
   </div>
 
-  <!-- SITE DETAIL PANEL (shown when a site is selected) -->
-  <div class="site-panel" id="sitePanel">
-    <div class="site-panel-header">
-      <div class="site-panel-title" id="sitePanelTitle">Site</div>
-      <div class="site-panel-sub" id="sitePanelSub">Week ending Sun 05 Jul 2026</div>
-    </div>
-    <div class="site-metrics">
-      <div>
-        <div class="sm-label">Total Hours</div>
-        <div class="sm-value" id="sp-hours">—</div>
-        <div class="sm-sub" id="sp-hours-pct">—</div>
-        <div class="bar-wrap"><div class="bar-fill" id="sp-hours-bar" style="background:#0078d4;width:0%"></div></div>
-      </div>
-      <div>
-        <div class="sm-label">Overtime Hours</div>
-        <div class="sm-value" id="sp-ot">—</div>
-        <div class="sm-sub" id="sp-ot-pct">—</div>
-        <div class="bar-wrap"><div class="bar-fill" id="sp-ot-bar" style="background:#d13438;width:0%"></div></div>
-      </div>
-      <div>
-        <div class="sm-label">Labour Cost</div>
-        <div class="sm-value" id="sp-cost">—</div>
-        <div class="sm-sub" id="sp-cost-pct">—</div>
-        <div class="bar-wrap"><div class="bar-fill" id="sp-cost-bar" style="background:#107c10;width:0%"></div></div>
-      </div>
-      <div>
-        <div class="sm-label">Travel + Allowances</div>
-        <div class="sm-value" id="sp-travel">—</div>
-        <div class="sm-sub" id="sp-travel-pct">—</div>
-      </div>
-    </div>
+  <!-- RUNNING WEEKLY HOURS CHART -->
+  <div class="card">
+    <div class="card-title" id="weeklyChartTitle">Weekly Labour Hours — All Sites (Fleet Total) <span>5 Apr – 12 Jul 2026 · week ending Sunday</span></div>
+    <div class="chart-wrap" style="height:320px"><canvas id="weeklyChart"></canvas></div>
   </div>
 
-  <!-- WEEK-ON-WEEK TRENDS -->
-  <div class="section-label">Week-on-Week Trends <span>&nbsp;·&nbsp; fleet total &nbsp;·&nbsp; 15–21 Jun vs 29 Jun–5 Jul 2026</span></div>
+  <!-- WOW TREND CARDS -->
+  <div class="section-label">Week-on-Week <span id="wowSectionLabel">&nbsp;·&nbsp; week ending 5 Jul vs 12 Jul 2026</span></div>
   <div class="wow-row">
     <div class="wow-card">
       <div class="wow-label">Total Hours</div>
-      <div class="wow-prev">2,908.5 prev week</div>
-      <div class="wow-curr">2,644.0</div>
-      <div class="wow-delta neg-good">↓ 264.5 hrs &nbsp;(−9.1%)</div>
+      <div class="wow-prev" id="wow-hours-prev">—</div>
+      <div class="wow-curr" id="wow-hours-curr">—</div>
+      <div class="wow-delta" id="wow-hours-delta">—</div>
     </div>
     <div class="wow-card">
-      <div class="wow-label">Gross Payroll</div>
-      <div class="wow-prev">$228,652 prev week</div>
-      <div class="wow-curr">$215,407</div>
-      <div class="wow-delta neg-good">↓ $13,245 &nbsp;(−5.8%)</div>
+      <div class="wow-label">Labour Cost</div>
+      <div class="wow-prev" id="wow-cost-prev">—</div>
+      <div class="wow-curr" id="wow-cost-curr">—</div>
+      <div class="wow-delta" id="wow-cost-delta">—</div>
     </div>
     <div class="wow-card">
-      <div class="wow-label">OT Hours</div>
-      <div class="wow-prev">316.5 hrs prev week</div>
-      <div class="wow-curr">271.0</div>
-      <div class="wow-delta neg-good">↓ 45.5 hrs &nbsp;(−14.4%)</div>
+      <div class="wow-label">Avg Hourly Rate</div>
+      <div class="wow-prev" id="wow-rate-prev">—</div>
+      <div class="wow-curr" id="wow-rate-curr">—</div>
+      <div class="wow-delta" id="wow-rate-delta">—</div>
     </div>
     <div class="wow-card">
-      <div class="wow-label">OT Cost</div>
-      <div class="wow-prev">$40,208 prev week</div>
-      <div class="wow-curr">$34,742</div>
-      <div class="wow-delta neg-good">↓ $5,466 &nbsp;(−13.6%)</div>
+      <div class="wow-label">Employees</div>
+      <div class="wow-prev" id="wow-emps-prev">—</div>
+      <div class="wow-curr" id="wow-emps-curr">—</div>
+      <div class="wow-delta" id="wow-emps-delta">—</div>
     </div>
     <div class="wow-card">
-      <div class="wow-label">Travel Cost</div>
-      <div class="wow-prev">$13,280 prev week</div>
-      <div class="wow-curr">$13,544</div>
-      <div class="wow-delta pos-bad">↑ $264 &nbsp;(+2.0%)</div>
+      <div class="wow-label">Peak Week (Hours)</div>
+      <div class="wow-prev" style="color:#1a1a2e;font-size:12px;font-weight:600;" id="wow-peak-label">—</div>
+      <div class="wow-curr" id="wow-peak-hrs">—</div>
+      <div class="wow-delta neutral" id="wow-peak-sub">historical peak</div>
     </div>
   </div>
 
-  <!-- CHARTS ROW 1 -->
+  <!-- HOURLY RATE + SITE TABLE -->
   <div class="row-2">
-    <div class="card">
-      <div class="card-title">Labour Cost by Site <span>direct labour · sorted by cost</span></div>
-      <div class="chart-wrap" style="height:310px"><canvas id="costChart"></canvas></div>
+    <div class="card" style="margin-bottom:0">
+      <div class="card-title" id="rateChartTitle">Average Hourly Rate by Site <span>weighted avg · all weeks with cost data</span></div>
+      <div class="chart-wrap" style="height:320px"><canvas id="rateChart"></canvas></div>
     </div>
-    <div class="card">
-      <div class="card-title">Overtime Hours by Site <span>sites with OT only</span></div>
-      <div class="chart-wrap" style="height:310px"><canvas id="otChart"></canvas></div>
-    </div>
-  </div>
-
-  <!-- CHARTS ROW 2 -->
-  <div class="row-2">
-    <div class="card">
-      <div class="card-title">Hours by Site <span>ordinary vs overtime · stacked</span></div>
-      <div class="chart-wrap" style="height:310px"><canvas id="hoursChart"></canvas></div>
-    </div>
-    <div class="card">
-      <div class="card-title">Payroll Composition <span>gross payroll $215,407 · week ending Sun 05 Jul</span></div>
-      <div class="chart-wrap" style="height:310px"><canvas id="compChart"></canvas></div>
+    <div class="card" style="margin-bottom:0">
+      <div class="card-title" id="pieChartTitle">Hours by Site <span id="pieChartSubtitle">week ending Sun 12 Jul</span></div>
+      <div class="chart-wrap" style="height:320px"><canvas id="currentPieChart"></canvas></div>
     </div>
   </div>
 
   <!-- FULL SITE TABLE -->
-  <div class="card">
-    <div class="card-title">Full Site Detail <span>all active sites · sorted by labour cost</span></div>
+  <div class="card" style="margin-top:20px">
+    <div class="card-title" id="tableTitle">Site Detail — Week ending Sun 12 Jul 2026 <span>costs from timesheet export</span></div>
     <div class="table-wrap">
       <table>
         <thead>
           <tr>
             <th>Site</th>
-            <th>Ord Hrs</th>
-            <th>OT Hrs</th>
-            <th>Total Hrs</th>
-            <th>OT Rate</th>
+            <th>Hours</th>
             <th>Labour Cost</th>
-            <th>OT Cost</th>
-            <th>Travel</th>
-            <th>Allowances</th>
-            <th>% Labour</th>
+            <th>Employees</th>
+            <th>Avg Rate</th>
+            <th>Prev Week Hrs</th>
+            <th>WoW Change</th>
+            <th>Hist Avg Rate</th>
           </tr>
         </thead>
         <tbody id="siteTable"></tbody>
         <tfoot>
-          <tr>
+          <tr id="tableFooter">
             <td>TOTAL</td>
-            <td>2,385.0</td>
-            <td>271.5</td>
-            <td>2,656.5</td>
-            <td>10.2%</td>
-            <td>$186,270.65</td>
-            <td>$34,772.75</td>
-            <td>$12,929.98</td>
-            <td>$11,236.58</td>
-            <td>100%</td>
+            <td id="tf-hours">—</td>
+            <td id="tf-cost">—</td>
+            <td id="tf-emps">—</td>
+            <td id="tf-rate">—</td>
+            <td id="tf-prev">—</td>
+            <td id="tf-wow">—</td>
+            <td id="tf-hist">—</td>
           </tr>
         </tfoot>
       </table>
@@ -348,213 +246,493 @@ tfoot td:first-child { text-align: left; }
 
 </div>
 
-<div class="footer">Northside Electrical &nbsp;·&nbsp; Labour Utilisation &nbsp;·&nbsp; Week ending Sun 05 Jul 2026 &nbsp;·&nbsp; For internal use only</div>
+<div class="footer">Northside Electrical &nbsp;·&nbsp; Labour Utilisation &nbsp;·&nbsp; Timesheet data 5 Apr – 12 Jul 2026 &nbsp;·&nbsp; For internal use only</div>
 
 <script>
-// [name, ordHours, otHours, totalHours, labourCost, otCost, travelCost, siteAllow, otPct, labourPct]
-const sites = [
-  ["Aston Craigieburn",      258.5, 115.5, 374.0, 31216.96, 14837.88, 1847.56, 1982.20, 30.9, 16.8],
-  ["BMEP - Ballarat",        237.0,   5.0, 242.0, 14763.18,   526.32, 2328.42, 1028.50,  2.1,  7.9],
-  ["Fountain Gate",          206.0,  23.0, 229.0, 17732.59,  3197.23, 1179.44, 1213.70, 10.0,  9.5],
-  ["Kennards Brunswick",     103.5,  16.5, 120.0,  9145.00,  2324.86,  502.05,   61.05, 13.8,  4.9],
-  ["Kennards Craigieburn",   168.0,  10.0, 178.0, 11567.72,  1411.80,  858.13,  943.40,  5.6,  6.2],
-  ["Kennards Cranbourne",     72.0,   0.0,  72.0,  4304.64,     0.00,  370.82,  381.60,  0.0,  2.3],
-  ["Kennards Roxburgh Park",  56.0,   4.0,  60.0,  3780.48,   546.96,  287.48,  318.00,  6.7,  2.0],
-  ["Kingston Aquatic Centre",240.0,  11.5, 251.5, 15736.37,  1611.09, 1322.40, 1068.88,  4.6,  8.4],
-  ["NTS Loan Labour",         32.0,   0.0,  32.0,  2187.84,     0.00,  169.20,   96.00,  0.0,  1.2],
-  ["Admin / Office",         298.0,   0.0, 298.0, 21620.91,     0.00,   84.60,   48.00,  0.0, 11.6],
-  ["General Services",        52.5,   0.0,  52.5,  3643.91,     0.00,  305.58,  133.50,  0.0,  2.0],
-  ["Punt Road Oval",         280.0,  31.0, 311.0, 20735.15,  3676.75, 1529.51, 1648.30, 10.0, 11.1],
-  ["Stacked Farm",           381.5,  55.0, 436.5, 29835.90,  6639.86, 2144.79, 2313.45, 12.6, 16.0],
-];
+// Week labels (week-ending Sunday)
+const weeks = ["5 Apr","12 Apr","19 Apr","26 Apr","3 May","10 May","17 May","24 May","31 May","7 Jun","14 Jun","21 Jun","28 Jun","5 Jul","12 Jul"];
+const W = weeks.length; // 15 weeks
 
-const totalHours  = sites.reduce((s,r) => s + r[3], 0);
-const totalOrd    = sites.reduce((s,r) => s + r[1], 0);
-const totalOT     = sites.reduce((s,r) => s + r[2], 0);
-const totalLabour = sites.reduce((s,r) => s + r[4], 0);
-const totalOTCost = sites.reduce((s,r) => s + r[5], 0);
-
-const fmtCur  = n => '$' + n.toLocaleString('en-AU', {minimumFractionDigits:2, maximumFractionDigits:2});
-const fmtK    = n => '$' + (n/1000).toFixed(0) + 'K';
-const fmtHrs  = n => n.toLocaleString('en-AU', {minimumFractionDigits:1, maximumFractionDigits:1});
-
-// Build table (sorted by labour cost desc)
-const tbody = document.getElementById('siteTable');
-[...sites].sort((a,b) => b[4]-a[4]).forEach(r => {
-  const idx = sites.indexOf(r);
-  const otBadge = r[8] >= 25 ? '<span class="badge-red">HIGH OT</span>'
-                : r[8] >= 10 ? '<span class="badge-amber">MOD OT</span>' : '';
-  tbody.innerHTML += `<tr data-idx="${idx}">
-    <td>${r[0]}${otBadge}</td>
-    <td>${fmtHrs(r[1])}</td>
-    <td>${r[2] > 0 ? fmtHrs(r[2]) : '<span class="cell-zero">—</span>'}</td>
-    <td>${fmtHrs(r[3])}</td>
-    <td>${r[8] > 0 ? r[8].toFixed(1)+'%' : '<span class="cell-zero">—</span>'}</td>
-    <td>${fmtCur(r[4])}</td>
-    <td>${r[5] > 0 ? fmtCur(r[5]) : '<span class="cell-zero">—</span>'}</td>
-    <td>${fmtCur(r[6])}</td>
-    <td>${fmtCur(r[7])}</td>
-    <td>${r[9].toFixed(1)}%</td>
-  </tr>`;
-});
-
-// CHART — Labour Cost by Site
-const costSorted = [...sites].sort((a,b) => b[4]-a[4]);
-const costColors = costSorted.map(r => r[8] >= 25 ? '#d13438' : r[8] >= 10 ? '#e8b84b' : '#0078d4');
-new Chart(document.getElementById('costChart'), {
-  type: 'bar',
-  data: {
-    labels: costSorted.map(r => r[0]),
-    datasets: [{ data: costSorted.map(r => r[4]), backgroundColor: costColors, borderRadius: 3 }]
+// Per-site data arrays (index = week, same order as weeks[])
+const raw = {
+  "Aston Craigieburn": {
+    h: [252.0,107.5,328.5,302.0,180.0,344.0,285.0,299.0,251.5,256.6,179.0,488.3,391.5,374.0,420.0],
+    c: [16740.26,6054.27,27577.40,24314.73,15058.51,28773.34,25558.27,26725.76,23380.11,19507.65,16254.54,42259.24,34287.17,35361.19,37363.03],
+    e: [9,8,9,10,7,10,9,11,6,8,6,14,15,17,14]
   },
-  options: {
-    indexAxis: 'y', responsive: true, maintainAspectRatio: false,
-    plugins: {
-      legend: { display: false },
-      tooltip: { callbacks: { label: c => ' ' + fmtCur(c.raw) + ' (' + ((c.raw/totalLabour)*100).toFixed(1) + '% of total)' } }
-    },
-    scales: {
-      x: { ticks: { callback: v => '$'+(v/1000).toFixed(0)+'K', font:{size:10} }, grid:{color:'#f0f0f0'} },
-      y: { ticks: { font:{size:11} } }
-    }
-  }
-});
-
-// CHART — OT Hours by Site
-const otSites = [...sites].filter(r => r[2] > 0).sort((a,b) => b[2]-a[2]);
-new Chart(document.getElementById('otChart'), {
-  type: 'bar',
-  data: {
-    labels: otSites.map(r => r[0]),
-    datasets: [{ data: otSites.map(r => r[2]), backgroundColor: otSites.map(r => r[8] >= 25 ? '#d13438' : '#e8b84b'), borderRadius: 3 }]
+  "BMEP - Ballarat": {
+    h: [263.0,80.0,296.0,296.0,176.0,294.0,251.0,272.0,227.0,200.0,192.5,234.0,246.5,242.0,316.0],
+    c: [16622.73,3758.32,21544.09,21084.54,15333.49,22902.91,19377.23,21330.84,16938.59,15327.25,16309.47,18891.00,22117.71,18171.21,32463.23],
+    e: [8,4,8,8,7,7,8,7,7,6,7,6,10,9,18]
   },
-  options: {
-    indexAxis: 'y', responsive: true, maintainAspectRatio: false,
-    plugins: {
-      legend: { display: false },
-      tooltip: { callbacks: { label: c => ' ' + c.raw + ' hrs (' + otSites[c.dataIndex][8].toFixed(1) + '% OT rate)' } }
-    },
-    scales: {
-      x: { ticks: { callback: v => v+'h', font:{size:10} }, grid:{color:'#f0f0f0'} },
-      y: { ticks: { font:{size:11} } }
-    }
-  }
-});
-
-// CHART — Hours stacked by Site
-const hoursSorted = [...sites].sort((a,b) => b[3]-a[3]);
-new Chart(document.getElementById('hoursChart'), {
-  type: 'bar',
-  data: {
-    labels: hoursSorted.map(r => r[0]),
-    datasets: [
-      { label: 'Ordinary', data: hoursSorted.map(r => r[1]), backgroundColor: '#0078d4', borderRadius: 2 },
-      { label: 'Overtime', data: hoursSorted.map(r => r[2]), backgroundColor: '#d13438', borderRadius: 2 }
-    ]
+  "Fountain Gate Super Centre": {
+    h: [90.0,65.5,188.0,160.5,159.5,224.0,205.0,275.0,262.0,256.3,171.5,265.5,286.0,229.0,279.0],
+    c: [7207.51,3984.73,15920.90,12085.00,12007.90,19305.91,18159.43,25204.84,24779.86,22566.95,16543.54,23364.34,31814.08,20220.79,28273.78],
+    e: [3,4,4,4,6,5,5,7,8,8,7,6,10,6,6]
   },
-  options: {
-    indexAxis: 'y', responsive: true, maintainAspectRatio: false,
-    plugins: {
-      legend: { position: 'bottom', labels: { font:{size:11}, padding:12 } },
-      tooltip: { callbacks: { label: c => ' ' + c.raw + ' hrs' } }
-    },
-    scales: {
-      x: { stacked: true, ticks: { callback: v => v+'h', font:{size:10} }, grid:{color:'#f0f0f0'} },
-      y: { stacked: true, ticks: { font:{size:11} } }
-    }
-  }
-});
-
-// CHART — Payroll Composition donut
-new Chart(document.getElementById('compChart'), {
-  type: 'doughnut',
-  data: {
-    labels: ['Ordinary Pay', 'Overtime', 'Travel', 'Site Allowances', 'Leave', 'Reimbursements / Other'],
-    datasets: [{
-      data: [154941.94, 34772.75, 13543.97, 11236.58, 11250.93, 3323.87],
-      backgroundColor: ['#0078d4','#d13438','#e8b84b','#107c10','#6c757d','#aaa'],
-      borderWidth: 3, borderColor: '#fff'
-    }]
+  "Kennards Brunswick": {
+    h: [88.5,87.0,113.0,224.0,124.5,157.0,166.5,235.0,263.5,357.5,274.3,243.0,141.0,120.0,58.5],
+    c: [4841.88,6291.13,7001.59,14530.10,10813.70,10759.49,13004.99,18279.95,22092.66,25832.43,22992.97,19790.38,12126.73,10223.46,4754.07],
+    e: [4,5,4,6,7,6,6,6,8,9,12,7,6,6,4]
   },
-  options: {
-    responsive: true, maintainAspectRatio: false,
-    plugins: {
-      legend: { position: 'bottom', labels: { font:{size:11}, padding:10, boxWidth:12 } },
-      tooltip: { callbacks: { label: c => ' ' + fmtCur(c.raw) + ' (' + ((c.raw/215407)*100).toFixed(1) + '%)' } }
-    },
-    cutout: '60%'
+  "Kennards Craigieburn": {
+    h: [42.0,0,74.0,73.5,33.0,65.0,69.0,74.0,99.0,122.0,86.5,166.5,147.0,178.0,171.5],
+    c: [3416.64,0,5529.40,6378.25,4092.61,7367.24,8095.13,8318.44,10787.74,10620.52,8813.61,14496.25,14299.51,13439.39,15139.32],
+    e: [2,0,3,2,2,2,3,3,3,5,4,4,5,5,5]
+  },
+  "Kennards Cranbourne": {
+    h: [32.0,32.0,80.0,72.0,48.0,57.0,56.0,57.0,33.0,25.5,64.5,79.7,68.5,72.0,69.5],
+    c: [2309.20,2288.72,5509.05,5038.90,3305.43,4240.64,3937.09,4240.64,2668.68,2046.87,4191.90,5898.25,5040.22,5085.56,5594.49],
+    e: [4,3,2,2,2,2,2,2,1,2,4,2,2,3,2]
+  },
+  "Kennards Roxburgh Park": {
+    h: [26.0,0,19.0,4.0,44.0,73.5,88.0,116.0,56.5,82.0,42.0,52.0,25.0,60.0,42.0],
+    c: [2219.76,0,2185.99,331.36,2886.01,4685.08,6355.17,9447.90,4212.34,6115.79,3450.45,4439.72,2037.02,4385.96,3140.47],
+    e: [2,0,1,1,3,2,3,3,3,3,4,2,1,2,2]
+  },
+  "Kingston Aquatic Centre": {
+    h: [190.5,76.0,250.0,248.5,160.0,258.5,177.5,238.5,170.5,196.0,113.5,220.0,213.5,251.5,219.0],
+    c: [13768.38,6840.12,20898.92,19407.54,13772.83,20544.80,14672.56,20006.97,13417.12,15422.61,10045.33,18532.68,17666.45,18252.03,17856.69],
+    e: [6,4,6,7,7,7,7,7,6,6,5,5,6,7,6]
+  },
+  "Mecwacare Ballan": {
+    h: [0,0,18.5,0,0,0,0,0,0,0,0,0,0,60.0,112.0],
+    c: [0,0,1474.11,0,0,0,0,0,0,0,0,0,0,4100.32,7758.50],
+    e: [0,0,2,0,0,0,0,0,0,0,0,0,0,5,4]
+  },
+  "NTS Loan Labour": {
+    h: [10.0,18.5,64.0,25.5,0,16.0,5.0,3.0,8.0,22.0,0,24.0,32.0,32.0,24.0],
+    c: [0,0,5112.06,2012.93,0,1206.04,426.94,259.28,570.96,1706.52,0,1839.78,2453.04,2453.04,1920.63],
+    e: [1,2,3,2,0,2,2,1,1,1,0,2,2,1,1]
+  },
+  "Northside Electrical Contractors": {
+    h: [412.0,347.0,398.0,347.5,392.2,745.2,1066.2,742.5,577.0,654.0,452.5,522.0,525.5,528.5,490.1],
+    c: [15195.40,18014.27,15844.63,21208.87,26346.96,48587.48,69652.56,50491.86,39960.82,41713.78,31362.09,35208.86,35084.77,38026.87,34762.36],
+    e: [19,22,23,23,23,29,60,37,26,32,28,27,28,23,24]
+  },
+  "Punt Road Oval": {
+    h: [147.0,70.0,236.0,202.5,111.5,242.5,141.5,202.5,224.0,264.5,157.5,298.0,271.5,311.0,223.0],
+    c: [8541.90,5484.40,19255.63,15032.13,9682.40,19183.52,11763.51,16848.71,20772.69,20528.47,14555.89,24309.85,22700.13,24204.76,18976.52],
+    e: [5,4,6,6,5,7,5,6,10,8,6,8,8,7,8]
+  },
+  "Stacked Farm": {
+    h: [210.0,96.0,351.0,320.0,242.0,290.0,324.0,701.0,632.0,454.4,303.0,419.5,340.0,436.5,408.0],
+    c: [14251.28,6336.86,25030.38,23174.30,17944.23,20220.51,25589.11,62636.64,56201.70,37917.15,25734.98,32019.75,27787.93,34593.99,32739.39],
+    e: [7,6,9,10,11,10,10,19,18,15,12,12,12,11,12]
   }
-});
+};
 
-// DROPDOWN — filter site
-function filterSite() {
-  const val = document.getElementById('siteSelect').value;
-  const panel = document.getElementById('sitePanel');
+const siteNames = Object.keys(raw);
 
-  document.querySelectorAll('#siteTable tr').forEach(r => r.classList.remove('selected-row'));
+// Helpers
+const $   = id => document.getElementById(id);
+const fC  = n  => '$' + n.toLocaleString('en-AU', {minimumFractionDigits:2, maximumFractionDigits:2});
+const fK  = n  => '$' + (n/1000).toFixed(0) + 'K';
+const fH  = n  => n.toLocaleString('en-AU', {minimumFractionDigits:1, maximumFractionDigits:1});
+const fR  = n  => '$' + n.toFixed(2) + '/h';
+const pct = (a,b) => b === 0 ? null : ((a-b)/b*100);
 
-  if (val === 'all') {
-    panel.classList.remove('visible');
-    setKpis(null);
+// Fleet totals per week
+const fleetHours = weeks.map((_,i) => siteNames.reduce((s,k) => s + raw[k].h[i], 0));
+const fleetCost  = weeks.map((_,i) => siteNames.reduce((s,k) => s + raw[k].c[i], 0));
+const fleetEmps  = weeks.map((_,i) => siteNames.reduce((s,k) => s + raw[k].e[i], 0));
+const fleetRate  = weeks.map((_,i) => fleetCost[i] > 0 ? fleetCost[i] / fleetHours[i] : 0);
+
+// Weighted avg rate per site (exclude zero-cost weeks)
+function siteAvgRate(key) {
+  let th = 0, tc = 0;
+  raw[key].h.forEach((h,i) => { if (raw[key].c[i] > 0) { th += h; tc += raw[key].c[i]; } });
+  return th > 0 ? tc / th : 0;
+}
+
+const displayName = k => k === "Northside Electrical Contractors" ? "Admin / Office" : k;
+
+// Read current selections
+function getCurIdx() { return parseInt($('weekSelect').value, 10); }
+function getPrvIdx() { const ci = getCurIdx(); return ci > 0 ? ci - 1 : null; }
+function getSiteKey() { return $('siteSelect').value; }
+
+// ──────────────────────────────────────────────
+// POPULATE WEEK DROPDOWN
+// ──────────────────────────────────────────────
+(function populateWeekSelect() {
+  const sel = $('weekSelect');
+  weeks.forEach((w, i) => {
+    const opt = document.createElement('option');
+    opt.value = i;
+    opt.textContent = 'Sun ' + w;
+    sel.appendChild(opt);
+  });
+  sel.value = W - 1; // default to most recent week
+})();
+
+// ──────────────────────────────────────────────
+// SITE COLORS
+// ──────────────────────────────────────────────
+const siteColors = {
+  "Stacked Farm":                  "#1a1a2e",
+  "Aston Craigieburn":             "#d13438",
+  "BMEP - Ballarat":               "#0078d4",
+  "Kingston Aquatic Centre":       "#107c10",
+  "Punt Road Oval":                "#e8b84b",
+  "Fountain Gate Super Centre":    "#8b5cf6",
+  "Kennards Brunswick":            "#0891b2",
+  "Kennards Craigieburn":          "#f97316",
+  "Kennards Cranbourne":           "#64748b",
+  "Kennards Roxburgh Park":        "#a16207",
+  "Northside Electrical Contractors": "#6b7280",
+  "NTS Loan Labour":               "#9ca3af",
+  "Mecwacare Ballan":              "#f472b6"
+};
+
+// ──────────────────────────────────────────────
+// WEEKLY CHART
+// ──────────────────────────────────────────────
+let weeklyChart = null;
+
+function buildWeeklyChart(siteKey) {
+  if (weeklyChart) { weeklyChart.destroy(); weeklyChart = null; }
+
+  const cur = getCurIdx();
+  const ctx = $('weeklyChart').getContext('2d');
+  let data, label, color;
+
+  if (siteKey === 'all') {
+    data  = fleetHours;
+    label = 'Fleet Total Hours';
+    color = '#0078d4';
+    $('weeklyChartTitle').innerHTML = 'Weekly Labour Hours — All Sites (Fleet Total) <span>5 Apr – 12 Jul 2026 · week ending Sunday</span>';
   } else {
-    const idx = parseInt(val);
-    const s = sites[idx];
-    panel.classList.add('visible');
-    document.getElementById('sitePanelTitle').textContent = s[0];
-    document.getElementById('sitePanelSub').textContent =
-      (s[8] >= 25 ? '⚠ HIGH OT — ' : s[8] >= 10 ? '↑ Moderate OT — ' : '') +
-      'Week ending Sun 05 Jul 2026';
+    data  = raw[siteKey].h;
+    label = displayName(siteKey);
+    color = siteColors[siteKey] || '#0078d4';
+    $('weeklyChartTitle').innerHTML = `Weekly Labour Hours — ${displayName(siteKey)} <span>5 Apr – 12 Jul 2026 · week ending Sunday</span>`;
+  }
 
-    const hPct = (s[3]/totalHours*100).toFixed(1);
-    document.getElementById('sp-hours').textContent = fmtHrs(s[3]) + ' hrs';
-    document.getElementById('sp-hours-pct').textContent = hPct + '% of fleet hours';
-    document.getElementById('sp-hours-bar').style.width = Math.min(parseFloat(hPct)*3.5, 100)+'%';
+  const bgColors = data.map((_, i) => i === cur ? color : color + '66');
+  const borders  = data.map((_, i) => i === cur ? color : color + '99');
 
-    document.getElementById('sp-ot').textContent = s[2] > 0 ? fmtHrs(s[2]) + ' hrs' : 'Nil';
-    document.getElementById('sp-ot-pct').textContent = s[8].toFixed(1) + '% OT rate';
-    document.getElementById('sp-ot-bar').style.width = Math.min(s[8]*3, 100)+'%';
+  weeklyChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: weeks,
+      datasets: [{
+        label,
+        data,
+        backgroundColor: bgColors,
+        borderColor: borders,
+        borderWidth: 1,
+        borderRadius: 3
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: c => {
+              const i = c.dataIndex;
+              const h = c.raw;
+              const cost = siteKey === 'all' ? fleetCost[i] : raw[siteKey].c[i];
+              const rate = cost > 0 && h > 0 ? (cost/h).toFixed(2) : '—';
+              const e = siteKey === 'all' ? fleetEmps[i] : raw[siteKey].e[i];
+              return [` ${fH(h)} hrs`, cost > 0 ? ` ${fK(cost)} cost` : ' cost pending', ` $${rate}/h avg rate`, ` ${e} employees`];
+            }
+          }
+        }
+      },
+      scales: {
+        x: { grid: { display: false }, ticks: { font: { size: 10 } } },
+        y: {
+          ticks: { callback: v => v + 'h', font: { size: 10 } },
+          grid: { color: '#f0f0f0' },
+          title: { display: true, text: 'Hours', font: { size: 10 }, color: '#888' }
+        }
+      }
+    }
+  });
+}
 
-    document.getElementById('sp-cost').textContent = fmtCur(s[4]);
-    document.getElementById('sp-cost-pct').textContent = s[9].toFixed(1) + '% of total labour';
-    document.getElementById('sp-cost-bar').style.width = Math.min(s[9]*4, 100)+'%';
+// ──────────────────────────────────────────────
+// AVG RATE CHART (rebuildable)
+// ──────────────────────────────────────────────
+let rateChart = null;
 
-    const tav = s[6] + s[7];
-    document.getElementById('sp-travel').textContent = fmtCur(tav);
-    document.getElementById('sp-travel-pct').textContent = ((tav/s[4])*100).toFixed(1) + '% of site labour cost';
+function buildRateChart(siteKey) {
+  if (rateChart) { rateChart.destroy(); rateChart = null; }
 
-    document.querySelectorAll('#siteTable tr').forEach(row => {
-      if (parseInt(row.dataset.idx) === idx) row.classList.add('selected-row');
+  let rates;
+  if (siteKey === 'all') {
+    rates = siteNames
+      .map(k => ({ name: displayName(k), rate: siteAvgRate(k), color: '#0078d4' }))
+      .filter(r => r.rate > 0)
+      .sort((a,b) => b.rate - a.rate);
+    $('rateChartTitle').innerHTML = 'Average Hourly Rate by Site <span>weighted avg · all weeks with cost data</span>';
+  } else {
+    const rate = siteAvgRate(siteKey);
+    rates = rate > 0 ? [{ name: displayName(siteKey), rate, color: siteColors[siteKey] || '#0078d4' }] : [];
+    $('rateChartTitle').innerHTML = `Avg Hourly Rate — ${displayName(siteKey)} <span>weighted avg · all weeks with cost data</span>`;
+  }
+
+  rateChart = new Chart($('rateChart').getContext('2d'), {
+    type: 'bar',
+    data: {
+      labels: rates.map(r => r.name),
+      datasets: [{
+        data: rates.map(r => r.rate),
+        backgroundColor: siteKey === 'all'
+          ? rates.map(r => r.rate >= 90 ? '#d13438' : r.rate >= 80 ? '#e8b84b' : '#0078d4')
+          : rates.map(r => r.color),
+        borderRadius: 3
+      }]
+    },
+    options: {
+      indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: c => ` $${c.raw.toFixed(2)}/h avg rate` } }
+      },
+      scales: {
+        x: { min: 50, ticks: { callback: v => '$' + v, font: { size: 10 } }, grid: { color: '#f0f0f0' } },
+        y: { ticks: { font: { size: 11 } } }
+      }
+    }
+  });
+}
+
+// ──────────────────────────────────────────────
+// CURRENT WEEK PIE CHART (rebuildable)
+// ──────────────────────────────────────────────
+let pieChart = null;
+
+function buildPieChart(siteKey) {
+  if (pieChart) { pieChart.destroy(); pieChart = null; }
+
+  const cur = getCurIdx();
+  const weekLabel = 'Sun ' + weeks[cur];
+  $('pieChartSubtitle').textContent = 'week ending ' + weekLabel;
+
+  let labels, data, colors, tooltipFn;
+  const totalFleet = fleetHours[cur];
+
+  if (siteKey === 'all') {
+    $('pieChartTitle').innerHTML = `Hours by Site <span id="pieChartSubtitle">week ending ${weekLabel}</span>`;
+    const entries = siteNames
+      .map(k => ({ name: displayName(k), h: raw[k].h[cur], color: siteColors[k] || '#888' }))
+      .filter(r => r.h > 0)
+      .sort((a,b) => b.h - a.h);
+    labels = entries.map(r => r.name);
+    data   = entries.map(r => r.h);
+    colors = entries.map(r => r.color);
+    tooltipFn = c => ` ${fH(c.raw)} hrs (${totalFleet > 0 ? ((c.raw/totalFleet)*100).toFixed(1) : '0'}%)`;
+  } else {
+    $('pieChartTitle').innerHTML = `Hours by Site <span id="pieChartSubtitle">week ending ${weekLabel}</span>`;
+    const siteH  = raw[siteKey].h[cur];
+    const otherH = Math.max(0, totalFleet - siteH);
+    labels = [displayName(siteKey), 'Other Sites'];
+    data   = [siteH, otherH];
+    colors = [siteColors[siteKey] || '#0078d4', '#e0e0e0'];
+    tooltipFn = c => ` ${fH(c.raw)} hrs (${totalFleet > 0 ? ((c.raw/totalFleet)*100).toFixed(1) : '0'}%)`;
+  }
+
+  pieChart = new Chart($('currentPieChart').getContext('2d'), {
+    type: 'doughnut',
+    data: {
+      labels,
+      datasets: [{
+        data,
+        backgroundColor: colors,
+        borderWidth: 2, borderColor: '#fff'
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'bottom', labels: { font: { size: 10 }, padding: 8, boxWidth: 10 } },
+        tooltip: { callbacks: { label: tooltipFn } }
+      },
+      cutout: '55%'
+    }
+  });
+}
+
+// ──────────────────────────────────────────────
+// SITE TABLE
+// ──────────────────────────────────────────────
+function buildTable(filter) {
+  const cur = getCurIdx();
+  const prv = getPrvIdx();
+  const tbody = $('siteTable');
+  tbody.innerHTML = '';
+
+  $('tableTitle').innerHTML = `Site Detail — Week ending Sun ${weeks[cur]} 2026 <span>costs from timesheet export</span>`;
+
+  const rows = siteNames
+    .filter(k => filter === 'all' || k === filter)
+    .map(k => {
+      const hCur = raw[k].h[cur], cCur = raw[k].c[cur], eCur = raw[k].e[cur];
+      const hPrv = prv !== null ? raw[k].h[prv] : 0;
+      const cPrv = prv !== null ? raw[k].c[prv] : 0;
+      const rate = hCur > 0 && cCur > 0 ? cCur / hCur : null;
+      const histRate = siteAvgRate(k);
+      const wow = hPrv > 0 ? pct(hCur, hPrv) : null;
+      return { k, hCur, cCur, eCur, hPrv, cPrv, rate, histRate, wow };
+    })
+    .sort((a,b) => b.hCur - a.hCur);
+
+  let totH = 0, totC = 0, totE = 0, totPrv = 0;
+  rows.forEach(r => {
+    totH += r.hCur; totC += r.cCur; totE += r.eCur; totPrv += r.hPrv;
+
+    const wowStr = r.wow !== null
+      ? `<span class="${r.wow < 0 ? 'neg-good' : 'pos-bad'}">${r.wow > 0 ? '+' : ''}${r.wow.toFixed(1)}%</span>`
+      : '<span class="cell-zero">—</span>';
+
+    tbody.innerHTML += `<tr data-site="${r.k}">
+      <td>${displayName(r.k)}</td>
+      <td>${fH(r.hCur)}</td>
+      <td>${r.cCur > 0 ? fC(r.cCur) : '<span class="cell-zero">pending</span>'}</td>
+      <td>${r.eCur}</td>
+      <td>${r.rate !== null ? fR(r.rate) : '<span class="cell-zero">—</span>'}</td>
+      <td>${r.hPrv > 0 ? fH(r.hPrv) : '<span class="cell-zero">—</span>'}</td>
+      <td>${wowStr}</td>
+      <td>${r.histRate > 0 ? fR(r.histRate) : '<span class="cell-zero">—</span>'}</td>
+    </tr>`;
+  });
+
+  const totRate = totC > 0 && totH > 0 ? fR(totC/totH) : '—';
+  const totWow  = totPrv > 0 ? ((totH - totPrv)/totPrv*100).toFixed(1) + '%' : '—';
+  const totHistRate = (() => {
+    let th = 0, tc = 0;
+    rows.forEach(r => {
+      raw[r.k].h.forEach((h,i) => { if (raw[r.k].c[i] > 0) { th += h; tc += raw[r.k].c[i]; } });
     });
+    return th > 0 ? fR(tc/th) : '—';
+  })();
 
-    setKpis(s);
-  }
+  $('tf-hours').textContent = fH(totH);
+  $('tf-cost').textContent  = totC > 0 ? fC(totC) : 'pending';
+  $('tf-emps').textContent  = totE;
+  $('tf-rate').textContent  = totRate;
+  $('tf-prev').textContent  = fH(totPrv);
+  $('tf-wow').textContent   = totWow;
+  $('tf-hist').textContent  = totHistRate;
 }
 
-function setKpis(s) {
-  if (!s) {
-    document.getElementById('kpi-hours').textContent     = fmtHrs(totalHours);
-    document.getElementById('kpi-hours-sub').textContent = 'all sites · week ending Sun';
-    document.getElementById('kpi-ord').textContent       = fmtHrs(totalOrd);
-    document.getElementById('kpi-ord-sub').textContent   = ((totalOrd/totalHours)*100).toFixed(1) + '% of total hours';
-    document.getElementById('kpi-ot').textContent        = fmtHrs(totalOT);
-    document.getElementById('kpi-ot-sub').textContent    = ((totalOT/totalHours)*100).toFixed(1) + '% OT rate';
-    document.getElementById('kpi-cost').textContent      = fmtK(totalLabour);
-    document.getElementById('kpi-cost-sub').textContent  = 'direct site labour · all locations';
-    document.getElementById('kpi-ot-cost').textContent   = fmtCur(totalOTCost);
-    document.getElementById('kpi-ot-cost-sub').textContent = ((totalOTCost/totalLabour)*100).toFixed(1) + '% of labour cost';
-  } else {
-    document.getElementById('kpi-hours').textContent     = fmtHrs(s[3]);
-    document.getElementById('kpi-hours-sub').textContent = ((s[3]/totalHours)*100).toFixed(1) + '% of fleet total';
-    document.getElementById('kpi-ord').textContent       = fmtHrs(s[1]);
-    document.getElementById('kpi-ord-sub').textContent   = ((s[1]/s[3])*100).toFixed(1) + '% of site hours';
-    document.getElementById('kpi-ot').textContent        = s[2] > 0 ? fmtHrs(s[2]) : '0.0';
-    document.getElementById('kpi-ot-sub').textContent    = s[8].toFixed(1) + '% OT rate';
-    document.getElementById('kpi-cost').textContent      = fmtCur(s[4]);
-    document.getElementById('kpi-cost-sub').textContent  = s[9].toFixed(1) + '% of total labour';
-    document.getElementById('kpi-ot-cost').textContent   = s[5] > 0 ? fmtCur(s[5]) : '$0.00';
-    document.getElementById('kpi-ot-cost-sub').textContent = s[5] > 0 ? ((s[5]/s[4])*100).toFixed(1) + '% of site labour' : 'no overtime this week';
+// ──────────────────────────────────────────────
+// KPI CARDS + WOW
+// ──────────────────────────────────────────────
+function updateKpis(siteKey) {
+  const cur = getCurIdx();
+  const prv = getPrvIdx();
+  const isAll = siteKey === 'all';
+  const weekLabel = weeks[cur];
+  const prvLabel  = prv !== null ? weeks[prv] : null;
+
+  const hCur = isAll ? fleetHours[cur] : raw[siteKey].h[cur];
+  const cCur = isAll ? fleetCost[cur]  : raw[siteKey].c[cur];
+  const eCur = isAll ? fleetEmps[cur]  : raw[siteKey].e[cur];
+  const hPrv = prv !== null ? (isAll ? fleetHours[prv] : raw[siteKey].h[prv]) : 0;
+  const cPrv = prv !== null ? (isAll ? fleetCost[prv]  : raw[siteKey].c[prv]) : 0;
+  const ePrv = prv !== null ? (isAll ? fleetEmps[prv]  : raw[siteKey].e[prv]) : 0;
+
+  const rate = hCur > 0 && cCur > 0 ? cCur/hCur : null;
+  const ratePrv = hPrv > 0 && cPrv > 0 ? cPrv/hPrv : null;
+  const wow = hPrv > 0 ? pct(hCur, hPrv) : null;
+
+  // Update header badge
+  $('headerBadge').textContent = 'Week ending Sun ' + weekLabel + ' 2026';
+
+  $('kpi-hours').textContent    = fH(hCur);
+  $('kpi-hours-sub').textContent = isAll ? `all sites · week ending ${weekLabel}` : `${displayName(siteKey)} · ${weekLabel}`;
+  $('kpi-emps').textContent     = eCur;
+  $('kpi-emps-sub').textContent = 'on timesheets this week';
+  $('kpi-cost').textContent     = cCur > 0 ? fK(cCur) : '—';
+  $('kpi-cost-sub').textContent = cCur > 0 ? `week ending ${weekLabel}` : 'cost pending';
+  $('kpi-rate').textContent     = rate !== null ? fR(rate) : '—';
+  $('kpi-rate-sub').textContent = 'selected week avg rate';
+  $('kpi-wow').textContent      = wow !== null ? (wow > 0 ? '+' : '') + wow.toFixed(1) + '%' : '—';
+  $('kpi-wow-sub').textContent  = prvLabel ? `hours vs week ending ${prvLabel}` : 'no prior week';
+
+  // WoW section label
+  const siteLabel = isAll ? '(fleet)' : `(${displayName(siteKey)})`;
+  $('wowSectionLabel').textContent = prvLabel
+    ? ` · week ending ${prvLabel} vs ${weekLabel} ${siteLabel}`
+    : ` · ${weekLabel} ${siteLabel}`;
+
+  function wowCard(prevId, currId, deltaId, prev, curr, isCostGoodDown, unit) {
+    $(prevId).textContent = unit === '$' ? (prev > 0 ? fK(prev) : '—') : (prev > 0 ? fH(prev) : '—');
+    $(currId).textContent = unit === '$' ? (curr > 0 ? fK(curr) : '—') : fH(curr);
+    if (prev > 0) {
+      const d = pct(curr, prev);
+      const cls = isCostGoodDown ? (d < 0 ? 'neg-good' : 'pos-bad') : (d < 0 ? 'neg-bad' : 'pos-good');
+      $(deltaId).className = 'wow-delta ' + cls;
+      $(deltaId).textContent = (d > 0 ? '↑ +' : '↓ ') + d.toFixed(1) + '%';
+    } else {
+      $(deltaId).textContent = '—';
+      $(deltaId).className = 'wow-delta neutral';
+    }
   }
+
+  wowCard('wow-hours-prev','wow-hours-curr','wow-hours-delta', hPrv, hCur, false, 'h');
+  wowCard('wow-cost-prev', 'wow-cost-curr', 'wow-cost-delta',  cPrv, cCur, true,  '$');
+
+  $('wow-rate-prev').textContent = ratePrv !== null ? fR(ratePrv) : '—';
+  $('wow-rate-curr').textContent = rate    !== null ? fR(rate)    : '—';
+  if (ratePrv !== null && rate !== null) {
+    const rd = pct(rate, ratePrv);
+    $('wow-rate-delta').className = 'wow-delta ' + (rd > 0 ? 'pos-bad' : 'neg-good');
+    $('wow-rate-delta').textContent = (rd > 0 ? '↑ +' : '↓ ') + rd.toFixed(1) + '%';
+  } else { $('wow-rate-delta').textContent = '—'; $('wow-rate-delta').className = 'wow-delta neutral'; }
+
+  $('wow-emps-prev').textContent = ePrv || '—';
+  $('wow-emps-curr').textContent = eCur;
+  if (ePrv > 0) {
+    const ed = pct(eCur, ePrv);
+    $('wow-emps-delta').className = 'wow-delta ' + (ed < 0 ? 'neg-bad' : 'pos-good');
+    $('wow-emps-delta').textContent = (ed > 0 ? '↑ +' : '↓ ') + ed.toFixed(1) + '%';
+  } else { $('wow-emps-delta').textContent = '—'; $('wow-emps-delta').className = 'wow-delta neutral'; }
+
+  // Peak week
+  const hArr = isAll ? fleetHours : raw[siteKey].h;
+  const peakIdx = hArr.indexOf(Math.max(...hArr));
+  $('wow-peak-label').textContent = 'Wk ' + weeks[peakIdx];
+  $('wow-peak-hrs').textContent   = fH(hArr[peakIdx]) + ' hrs';
+  $('wow-peak-sub').textContent   = 'historical peak week';
 }
+
+// ──────────────────────────────────────────────
+// REBUILD ALL (called by both dropdowns)
+// ──────────────────────────────────────────────
+function rebuildAll() {
+  const site = getSiteKey();
+  const isAll = site === 'all';
+
+  buildWeeklyChart(site);
+  buildRateChart(site);
+  buildPieChart(site);
+  buildTable(site);
+  updateKpis(site);
+
+  const cur = getCurIdx();
+  $('toolbarMeta').textContent = isAll
+    ? `15 weeks of data · 13 sites · costs from timesheet export`
+    : `${displayName(site)} · week ending ${weeks[cur]}`;
+
+  document.querySelectorAll('#siteTable tr').forEach(r => {
+    r.classList.toggle('selected-row', !isAll && r.dataset.site === site);
+  });
+}
+
+// ──────────────────────────────────────────────
+// DROPDOWN HANDLERS
+// ──────────────────────────────────────────────
+function onSiteChange() { rebuildAll(); }
+function onWeekChange() { rebuildAll(); }
+
+// ── Init ──
+rebuildAll();
 </script>
 </body>
 </html>

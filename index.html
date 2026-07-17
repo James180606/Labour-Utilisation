@@ -84,6 +84,12 @@ tfoot td { font-weight: 700; background: #1a1a2e; color: white; padding: 9px 12p
 tfoot td:first-child { text-align: left; }
 .cell-zero { color: #ccc; }
 
+.emp-toggle { background: none; border: 1px solid #d0d0d0; border-radius: 3px; font-size: 10px; padding: 1px 5px; cursor: pointer; margin-left: 6px; color: #666; vertical-align: middle; }
+.emp-toggle:hover { background: #e8f0fe; border-color: #0078d4; color: #0078d4; }
+tr.emp-row td { background: #f7faff !important; padding: 6px 12px 10px 24px; border-bottom: 1px solid #e4ecf8; }
+.emp-tags { display: flex; flex-wrap: wrap; gap: 4px; }
+.emp-tag { background: #e8f0fe; color: #1a4a7a; font-size: 10px; font-weight: 500; padding: 2px 8px; border-radius: 10px; white-space: nowrap; }
+
 .footer { text-align: center; font-size: 11px; color: #aaa; padding: 14px; margin-top: 4px; }
 </style>
 </head>
@@ -484,6 +490,242 @@ function buildWeeklyChart(siteKey) {
 }
 
 // ──────────────────────────────────────────────
+// EMPLOYEE DATA (per site, per week index)
+// ──────────────────────────────────────────────
+const empData = {
+  "Aston Craigieburn": {
+    0:["Aidan Mulhern","Alexanda Bollen","David Simmonds","Heath Dudley","Holden Kneebone","Jarryd Dawson","Ryan Pretty","Simon Collard","Tyler Amor-Beale"],
+    1:["Alexanda Bollen","David Simmonds","Heath Dudley","Jarryd Dawson","Mark Kholodii","Ryan Pretty","Simon Collard","Tyler Amor-Beale"],
+    2:["Alexanda Bollen","David Simmonds","Heath Dudley","Holden Kneebone","Jarryd Dawson","Nick Govic","Ryan Pretty","Simon Collard","Tyler Amor-Beale"],
+    3:["Alessio Ameduri","Alexanda Bollen","David Simmonds","Holden Kneebone","Jarryd Dawson","Nick Govic","Ryan Pretty","Simon Collard","Tyler Amor-Beale","Vincent Lee"],
+    4:["Alexanda Bollen","Holden Kneebone","Jarryd Dawson","Nick Govic","Ryan Pretty","Simon Collard","Tyler Amor-Beale"],
+    5:["Alexanda Bollen","Daniel OReilly","Holden Kneebone","Jarryd Dawson","Mark Kholodii","Nick Govic","Ryan Pretty","Simon Collard","Stephen Wethling","Tyler Amor-Beale"],
+    6:["Alessio Ameduri","Alexanda Bollen","Daniel OReilly","Holden Kneebone","Jarryd Dawson","Nick Govic","Ryan Pretty","Simon Collard","Tyler Amor-Beale"],
+    7:["Alessio Ameduri","Alexanda Bollen","David Simmonds","Holden Kneebone","Jarryd Dawson","Jonathan Kuoch","Mark Kholodii","Nick Govic","Ryan Pretty","Simon Collard","Tyler Amor-Beale"],
+    8:["Alexanda Bollen","Holden Kneebone","Jarryd Dawson","Nick Govic","Ryan Pretty","Tyler Amor-Beale"],
+    9:["Alessio Ameduri","Alexanda Bollen","Holden Kneebone","Jarryd Dawson","Mark Kholodii","Nick Govic","Ryan Pretty","Tyler Amor-Beale"],
+    10:["Alexanda Bollen","Holden Kneebone","Jarryd Dawson","Nick Govic","Ryan Pretty","Tyler Amor-Beale"],
+    11:["Alexanda Bollen","Benjamin Pike","Daniel OReilly","David Simmonds","Holden Kneebone","Jarryd Dawson","Jonathan Kuoch","Liam Chris","Mark Kholodii","Nicholas Karakyriakos","Nick Govic","Ryan Pretty","Simon Collard","Tyler Amor-Beale"],
+    12:["Alexanda Bollen","Andrew Scicluna","Benjamin Pike","Daniel OReilly","David Capuano","David Simmonds","Holden Kneebone","Jarryd Dawson","Jonathan Kuoch","Liam Chris","Marcus Santilli","Nicholas Jacobson","Nick Govic","Ryan Pretty","Tyler Amor-Beale"],
+    13:["Alexanda Bollen","Andrew Scicluna","Bradley Wildoer","Daniel OReilly","David Simmonds","Heath Dudley","Holden Kneebone","James Cilia","Jarryd Dawson","Nicholas Karakyriakos","Nick Govic","Nicolas Augelli","Philip James Goatcher","Ryan Pretty","Tyler Amor-Beale","William Del Mar","Zack Rozenboom"],
+    14:["Alexanda Bollen","Alexander Shaw","Connor Shea","David Simmonds","Heath Dudley","Holden Kneebone","Jarryd Dawson","Mark Kholodii","Nick Govic","Nicolas Augelli","Philip James Goatcher","Ryan Pretty","Simon Collard","William Del Mar"]
+  },
+  "BMEP - Ballarat": {
+    0:["Anthony Atzori","Bec Lee","India Wren","Isaac Pedretti","Joe Downey","Kristian Green","Mike Aston","Stephen Wethling"],
+    1:["Anthony Atzori","Bec Lee","India Wren","Mike Aston"],
+    2:["Anthony Atzori","Bec Lee","India Wren","Isaac Pedretti","Joe Downey","Kristian Green","Mike Aston","Stephen Wethling"],
+    3:["Anthony Atzori","Bec Lee","India Wren","Isaac Pedretti","Joe Downey","Kristian Green","Mike Aston","Stephen Wethling"],
+    4:["Anthony Atzori","Bec Lee","India Wren","Joe Downey","Kristian Green","Mike Aston","Stephen Wethling"],
+    5:["Bec Lee","India Wren","Isaac Pedretti","Joe Downey","Kristian Green","Mike Aston","Stephen Wethling"],
+    6:["Bec Lee","India Wren","Isaac Pedretti","Joe Downey","Kristian Green","Mike Aston","Simon Collard","Stephen Wethling"],
+    7:["Bec Lee","India Wren","Isaac Pedretti","Joe Downey","Kristian Green","Mike Aston","Stephen Wethling"],
+    8:["Bec Lee","India Wren","Isaac Pedretti","Joe Downey","Kristian Green","Mike Aston","Stephen Wethling"],
+    9:["Bec Lee","India Wren","Joe Downey","Kristian Green","Mike Aston","Stephen Wethling"],
+    10:["Bec Lee","India Wren","Isaac Pedretti","Joe Downey","Mike Aston","Simon Collard","Stephen Wethling"],
+    11:["Bec Lee","India Wren","Isaac Pedretti","Joe Downey","Mike Aston","Stephen Wethling"],
+    12:["Bec Lee","Bradley Wildoer","Connor Shea","India Wren","Isaac Pedretti","Joe Downey","Jonathan Kuoch","Lucas Aquilina","Mike Aston","Stephen Wethling"],
+    13:["Bec Lee","Benjamin Pike","Bradley Wildoer","Isaac Pedretti","Joe Downey","Jonathan Kuoch","Liam Chris","Mike Aston","Stephen Wethling"],
+    14:["Aimee Kinnane","Alexander Shaw","Angus Lambert","Bec Lee","Benjamin Pike","Bradley Wildoer","Connor Shea","Daniel OReilly","India Wren","Isaac Pedretti","Joe Downey","Jonathan Kuoch","Liam Chris","Loretta Harradine","Mark Kholodii","Mike Aston","Stephen Wethling","William Del Mar"]
+  },
+  "Fountain Gate Super Centre": {
+    0:["John Arbace","Oscar Hambidge","Stephen Cocks"],
+    1:["John Arbace","Oscar Hambidge","Philip James Goatcher","Stephen Cocks"],
+    2:["John Arbace","Oscar Hambidge","Philip James Goatcher","Stephen Cocks"],
+    3:["John Arbace","Oscar Hambidge","Philip James Goatcher","Stephen Cocks"],
+    4:["John Arbace","Nicholas Jacobson","Oscar Hambidge","Philip James Goatcher","Stephen Cocks","Zack Rozenboom"],
+    5:["John Arbace","Nicholas Jacobson","Oscar Hambidge","Philip James Goatcher","Stephen Cocks"],
+    6:["John Arbace","Nicholas Jacobson","Oscar Hambidge","Philip James Goatcher","Stephen Cocks"],
+    7:["David Olsen","John Arbace","Liam Deering","Nicholas Jacobson","Oscar Hambidge","Philip James Goatcher","Stephen Cocks"],
+    8:["David Olsen","John Arbace","Liam Deering","Nicholas Jacobson","Oscar Hambidge","Philip James Goatcher","Stephen Cocks","Zack Rozenboom"],
+    9:["Bradley Wildoer","David Olsen","John Arbace","Liam Deering","Oscar Hambidge","Philip James Goatcher","Stephen Cocks","Zack Rozenboom"],
+    10:["David Olsen","John Arbace","Liam Deering","Oscar Hambidge","Philip James Goatcher","Stephen Cocks","Zack Rozenboom"],
+    11:["David Olsen","John Arbace","Liam Deering","Oscar Hambidge","Philip James Goatcher","Stephen Cocks"],
+    12:["Bradley Wildoer","David Olsen","Dean Bickerdike","John Arbace","Liam Deering","Mark Kholodii","Oscar Hambidge","Philip James Goatcher","Stephen Cocks","Zack Rozenboom"],
+    13:["David Olsen","John Arbace","Liam Deering","Oscar Hambidge","Stephen Cocks","Vincent Lee"],
+    14:["David Olsen","John Arbace","Liam Deering","Oscar Hambidge","Stephen Cocks","Vincent Lee"]
+  },
+  "Kennards Brunswick": {
+    0:["Aimee Kinnane","Connor Shea","Marcus Santilli","Samuel Wolsgrove"],
+    1:["Aimee Kinnane","Kavany Cheung","Marcus Santilli","Samuel Wolsgrove","Simon Collard"],
+    2:["Aimee Kinnane","Connor Shea","Daniel OReilly","Samuel Wolsgrove"],
+    3:["Aimee Kinnane","Alessio Ameduri","Connor Shea","Daniel OReilly","Marcus Santilli","Samuel Wolsgrove"],
+    4:["Aimee Kinnane","Alessio Ameduri","Connor Shea","Daniel OReilly","Kavany Cheung","Samuel Wolsgrove","William Del Mar"],
+    5:["Aimee Kinnane","Alexander Shaw","Connor Shea","Daniel OReilly","Loretta Harradine","Samuel Wolsgrove"],
+    6:["Aimee Kinnane","Alexander Shaw","Connor Shea","Daniel OReilly","Loretta Harradine","Samuel Wolsgrove"],
+    7:["Aimee Kinnane","Alexander Shaw","Benjamin Pike","Connor Shea","Loretta Harradine","Samuel Wolsgrove"],
+    8:["Aimee Kinnane","Alexander Shaw","Connor Shea","Daniel OReilly","Jonathan Kuoch","Loretta Harradine","Marcus Santilli","Samuel Wolsgrove"],
+    9:["Aimee Kinnane","Alexander Shaw","Benjamin Pike","Connor Shea","Daniel OReilly","David Simmonds","Liam Chris","Loretta Harradine","Samuel Wolsgrove"],
+    10:["Aimee Kinnane","Alexander Shaw","Benjamin Pike","Bradley Wildoer","Connor Shea","Daniel OReilly","Kavany Cheung","Liam Chris","Loretta Harradine","Samuel Wolsgrove","Simon Collard","William Del Mar"],
+    11:["Aimee Kinnane","Alexander Shaw","Connor Shea","Daniel OReilly","David Simmonds","Loretta Harradine","Samuel Wolsgrove"],
+    12:["Aimee Kinnane","Alexander Shaw","Connor Shea","Daniel OReilly","Philip James Goatcher","Samuel Wolsgrove"],
+    13:["Alexander Shaw","Daniel OReilly","Marcus Santilli","Nicholas Jacobson","Philip James Goatcher","Samuel Wolsgrove"],
+    14:["Connor Shea","Daniel OReilly","Marcus Santilli","Samuel Wolsgrove"]
+  },
+  "Kennards Craigieburn": {
+    0:["Bogoja Eftimoski","Lucas Aquilina"],
+    2:["Bogoja Eftimoski","Lucas Aquilina","Marcus Santilli"],
+    3:["Bogoja Eftimoski","Lucas Aquilina"],
+    4:["Bogoja Eftimoski","Lucas Aquilina"],
+    5:["Bogoja Eftimoski","Lucas Aquilina"],
+    6:["Bogoja Eftimoski","Joshua Morganti","Lucas Aquilina"],
+    7:["Bogoja Eftimoski","Joshua Morganti","Lucas Aquilina"],
+    8:["Bogoja Eftimoski","Lucas Aquilina","Matthew Distefano"],
+    9:["Bogoja Eftimoski","Joshua Morganti","Lucas Aquilina","Marcus Santilli","Matthew Distefano"],
+    10:["Bogoja Eftimoski","Joshua Morganti","Lucas Aquilina","Matthew Distefano"],
+    11:["Lucas Aquilina","Marcus Santilli","Matthew Distefano","Nicholas Jacobson"],
+    12:["Bogoja Eftimoski","Lucas Aquilina","Marcus Santilli","Matthew Distefano","Nicholas Jacobson"],
+    13:["Lucas Aquilina","Marcus Santilli","Matthew Distefano","Nicholas Jacobson","Zaid Rumbold"],
+    14:["Lucas Aquilina","Marcus Santilli","Matthew Distefano","Nicholas Jacobson","Zaid Rumbold"]
+  },
+  "Kennards Cranbourne": {
+    0:["Aidan Mulhern","Benjamin Pike","John Arbace","Mark Kholodii"],
+    1:["Benjamin Pike","Mark Kholodii","Zack Rozenboom"],
+    2:["Mark Kholodii","Zack Rozenboom"],
+    3:["Mark Kholodii","Zack Rozenboom"],
+    4:["Mark Kholodii","Zack Rozenboom"],
+    5:["Mark Kholodii","Zack Rozenboom"],
+    6:["Mark Kholodii","Zack Rozenboom"],
+    7:["Mark Kholodii","Zack Rozenboom"],
+    8:["Zack Rozenboom"],
+    9:["Bradley Wildoer","Zack Rozenboom"],
+    10:["Marcus Santilli","Mark Kholodii","Patrick McLucas","Zack Rozenboom"],
+    11:["Mark Kholodii","Zack Rozenboom"],
+    12:["Mark Kholodii","Zack Rozenboom"],
+    13:["Mark Kholodii","Stephen Cocks","Zack Rozenboom"],
+    14:["Mark Kholodii","Zack Rozenboom"]
+  },
+  "Kennards Roxburgh Park": {
+    0:["Bogoja Eftimoski","Lucas Aquilina"],
+    2:["Lucas Aquilina"],
+    3:["Lucas Aquilina"],
+    4:["Bogoja Eftimoski","Lucas Aquilina","Marcus Santilli"],
+    5:["Bogoja Eftimoski","Marcus Santilli"],
+    6:["Bogoja Eftimoski","Joshua Morganti","Marcus Santilli"],
+    7:["Bogoja Eftimoski","Joshua Morganti","Marcus Santilli"],
+    8:["Bogoja Eftimoski","Joshua Morganti","Marcus Santilli"],
+    9:["Bogoja Eftimoski","Joshua Morganti","Marcus Santilli"],
+    10:["Bogoja Eftimoski","Joshua Morganti","Lucas Aquilina","Marcus Santilli"],
+    11:["Bogoja Eftimoski","Lucas Aquilina"],
+    12:["Bogoja Eftimoski"],
+    13:["Bogoja Eftimoski","Marcus Santilli"],
+    14:["Bogoja Eftimoski","Marcus Santilli"]
+  },
+  "Kingston Aquatic Centre": {
+    0:["Alexander Shaw","Brandon Dudley","Loretta Harradine","Nicolas Augelli","Trent Barrington","Vincent Lee"],
+    1:["Alexander Shaw","Brandon Dudley","Loretta Harradine","Trent Barrington"],
+    2:["Aidan Mulhern","Alexander Shaw","Brandon Dudley","Loretta Harradine","Trent Barrington","Vincent Lee"],
+    3:["Aidan Mulhern","Alexander Shaw","Brandon Dudley","Heath Dudley","Loretta Harradine","Nicolas Augelli","Trent Barrington"],
+    4:["Aidan Mulhern","Alexander Shaw","Brandon Dudley","Heath Dudley","Loretta Harradine","Nicolas Augelli","Trent Barrington"],
+    5:["Aidan Mulhern","Alexander Shaw","Brandon Dudley","Heath Dudley","Loretta Harradine","Nicolas Augelli","Trent Barrington"],
+    6:["Aidan Mulhern","Alexander Shaw","Brandon Dudley","Heath Dudley","Loretta Harradine","Nicolas Augelli","Trent Barrington"],
+    7:["Aidan Mulhern","Alexander Shaw","Brandon Dudley","Heath Dudley","Loretta Harradine","Nicolas Augelli","Trent Barrington"],
+    8:["Aidan Mulhern","Brandon Dudley","Heath Dudley","Jonathan Kuoch","Nicolas Augelli","Trent Barrington"],
+    9:["Aidan Mulhern","Bradley Wildoer","Brandon Dudley","Heath Dudley","Nicolas Augelli","Trent Barrington"],
+    10:["Aidan Mulhern","Brandon Dudley","Heath Dudley","Nicolas Augelli","Trent Barrington"],
+    11:["Aidan Mulhern","Brandon Dudley","Heath Dudley","Nicolas Augelli","Trent Barrington"],
+    12:["Aidan Mulhern","Brandon Dudley","Heath Dudley","Nicolas Augelli","Philip James Goatcher","Trent Barrington"],
+    13:["Aidan Mulhern","Alex Augelli","Brandon Dudley","Heath Dudley","Nicolas Augelli","Philip James Goatcher","Trent Barrington"],
+    14:["Aidan Mulhern","Alex Augelli","Brandon Dudley","Heath Dudley","Nicolas Augelli","Trent Barrington"]
+  },
+  "Mecwacare Ballan": {
+    1:["Daniel OReilly"],
+    2:["Benjamin Pike","Daniel OReilly"],
+    13:["Benjamin Pike","Bradley Wildoer","Daniel OReilly","Jonathan Kuoch","Liam Chris"],
+    14:["Benjamin Pike","Bradley Wildoer","Jonathan Kuoch","Liam Chris"]
+  },
+  "Northside Electrical Contractors": {
+    0:["Aimee Kinnane","Benjamin Pike","Bradley Wildoer","Daniel OReilly","David Simmonds","Holden Kneebone","Jarryd Dawson","Jonathan Kuoch","Kavany Cheung","Loretta Harradine","Marcus Santilli","Mark Carroll","Mark Kholodii","Mitch Anderson","Nicholas Karakyriakos","Orlando Lee","Samuel Wolsgrove","William Del Mar","Zack Rozenboom"],
+    1:["Aidan Mulhern","Andrew Scicluna","Bogoja Eftimoski","Bradley Wildoer","Christopher Tripodi","Connor Shea","Holden Kneebone","Isaac Pedretti","Jake Davies","Jarryd Dawson","Joe Downey","Jonathan Kuoch","Kristian Green","Lucas Aquilina","Nicolas Augelli","Orlando Lee","Patrick McLucas","Ryan Pretty","Stephen Wethling","Steve Amos","Vincent Lee","Zack Rozenboom"],
+    2:["Aimee Kinnane","Alexanda Bollen","Bec Lee","Bogoja Eftimoski","Bradley Wildoer","Connor Shea","Daniel OReilly","Darcy Krikori","David Simmonds","India Wren","Jarryd Dawson","Jonathan Kuoch","Kristian Green","Lucas Aquilina","Marcus Santilli","Mike Aston","Patrick McLucas","Richard Falla","Ryan Pretty","Simon Collard","Stephen Wethling","Vincent Lee","William Del Mar"],
+    3:["Aimee Kinnane","Andrew Scicluna","Angus Lambert","Bec Lee","Benjamin Pike","Bogoja Eftimoski","Bradley Wildoer","David Simmonds","Heath Dudley","Holden Kneebone","India Wren","Isaac Pedretti","Jonathan Kuoch","Kavany Cheung","Lucas Aquilina","Mark Carroll","Mark Kholodii","Nicholas Karakyriakos","Nicolas Augelli","Orlando Lee","Samuel Wolsgrove","Simon Collard","William Del Mar"],
+    4:["Aimee Kinnane","Benjamin Pike","Bradley Wildoer","Christopher Tripodi","Daniel OReilly","David Simmonds","Ella Jaeger","Heath Dudley","Isaac Pedretti","Jake Davies","Jonathan Kuoch","Kavany Cheung","Kristian Green","Lucas Aquilina","Mark Carroll","Mark Kholodii","Nicholas Karakyriakos","Orlando Lee","Patrick McLucas","Philip James Goatcher","Simon Collard","Stephen Wethling","Tyler Amor-Beale"],
+    5:["Aimee Kinnane","Bec Lee","Benjamin Pike","Bradley Wildoer","Christopher Tripodi","Daniel OReilly","David Capuano","David Simmonds","Dylan Adkins","Ella Jaeger","Heath Dudley","Jamie Binaisse","Jonathan Kuoch","Kavany Cheung","Kintija Jakse","Liam Chris","Marcus Santilli","Mark Carroll","Mark Kholodii","Nicholas Jacobson","Nicholas Karakyriakos","Novandro Ndoen","Oliver Tewson","Orlando Lee","Richard Falla","Steve Amos","Trent Barrington","William Del Mar","William Lacy"],
+    6:["Aidan Mulhern","Aimee Kinnane","Alessio Ameduri","Alexanda Bollen","Alexander Shaw","Andrew Scicluna","Angus Lambert","Bec Lee","Benjamin Pike","Bogoja Eftimoski","Bradley Wildoer","Brandon Dudley","Connor Shea","Daniel OReilly","Darcy Krikori","David Capuano","David Simmonds","Dylan Adkins","Ella Jaeger","Heath Dudley","Holden Kneebone","India Wren","Isaac Pedretti","Jake Davies","Jamie Binaisse","Jarryd Dawson","Joe Downey","John Arbace","Jonathan Kuoch","Joshua Morganti","Kavany Cheung","Kintija Jakse","Kristian Green","Liam Chris","Loretta Harradine","Marcus Santilli","Mark Carroll","Mark Kholodii","Mike Aston","Mitch Anderson","Nicholas Jacobson","Nicholas Karakyriakos","Nick Govic","Nicolas Augelli","Novandro Ndoen","Oliver Tewson","Orlando Lee","Patrick McLucas","Philip James Goatcher","Richard Falla","Ryan Pretty","Samuel Wolsgrove","Simon Collard","Stephen Wethling","Steve Amos","Trent Barrington","Tyler Amor-Beale","Vincent Lee","William Lacy","Zack Rozenboom"],
+    7:["Aidan Mulhern","Aimee Kinnane","Alexander Shaw","Angus Lambert","Bec Lee","Benjamin Pike","Bradley Wildoer","Daniel OReilly","David Capuano","David Simmonds","Dylan Adkins","Ella Jaeger","Heath Dudley","Holden Kneebone","India Wren","Jamie Binaisse","Jarryd Dawson","John Arbace","Jonathan Kuoch","Kintija Jakse","Kristian Green","Liam Chris","Marcus Santilli","Mark Carroll","Mark Kholodii","Mike Aston","Mitch Anderson","Nicholas Jacobson","Nicholas Karakyriakos","Nick Govic","Oliver Tewson","Orlando Lee","Patrick McLucas","Philip James Goatcher","Richard Falla","Trent Barrington","William Lacy"],
+    8:["Aimee Kinnane","Benjamin Pike","Bradley Wildoer","Connor Shea","David Capuano","David Simmonds","Dylan Adkins","Ella Jaeger","Heath Dudley","James King","Jamie Binaisse","Joe Downey","Jonathan Kuoch","Kintija Jakse","Kristian Green","Liam Chris","Marcus Santilli","Mark Carroll","Mark Kholodii","Mike Aston","Orlando Lee","Philip James Goatcher","Richard Falla","Simon Collard","Stephen Wethling","William Lacy"],
+    9:["Aimee Kinnane","Angus Lambert","Bec Lee","Bradley Wildoer","David Capuano","David Simmonds","Dylan Adkins","Ella Jaeger","Heath Dudley","Holden Kneebone","India Wren","Isaac Pedretti","James King","Jamie Binaisse","Jonathan Kuoch","Kintija Jakse","Kristian Green","Marcus Santilli","Mark Carroll","Mark Kholodii","Mitch Anderson","Nicholas Karakyriakos","Orlando Lee","Patrick McLucas","Philip James Goatcher","Richard Falla","Ryan Pretty","Simon Collard","Tyler Amor-Beale","Vincent Lee","William Del Mar","William Lacy"],
+    10:["Aimee Kinnane","Bradley Wildoer","Darcy Krikori","David Capuano","David Simmonds","Dylan Adkins","Ella Jaeger","Heath Dudley","Isaac Pedretti","James King","Jamie Binaisse","Joe Downey","Jonathan Kuoch","Kintija Jakse","Liam Chris","Marcus Santilli","Mark Carroll","Mark Kholodii","Novandro Ndoen","Orlando Lee","Patrick McLucas","Richard Falla","Simon Collard","Stephen Wethling","Trent Barrington","William Del Mar","William Lacy","Zack Rozenboom"],
+    11:["Aimee Kinnane","Andrew Scicluna","Bradley Wildoer","David Capuano","David Simmonds","Dylan Adkins","Ella Jaeger","Heath Dudley","Holden Kneebone","India Wren","Isaac Pedretti","James King","Jamie Binaisse","Jarryd Dawson","Jonathan Kuoch","Kavany Cheung","Kintija Jakse","Liam Chris","Marcus Santilli","Mark Carroll","Mike Aston","Novandro Ndoen","Orlando Lee","Philip James Goatcher","Richard Falla","Simon Collard","William Lacy"],
+    12:["Aimee Kinnane","Alexanda Bollen","Bradley Wildoer","Brandon Dudley","David Capuano","David Simmonds","Dylan Adkins","Ella Jaeger","Heath Dudley","Holden Kneebone","James King","Jamie Binaisse","Jarryd Dawson","Jonathan Kuoch","Kavany Cheung","Kintija Jakse","Loretta Harradine","Marcus Santilli","Mark Carroll","Mark Kholodii","Nicholas Karakyriakos","Nick Govic","Orlando Lee","Philip James Goatcher","Richard Falla","Simon Collard","Vincent Lee","William Lacy"],
+    13:["Alexanda Bollen","Andrew Scicluna","Bec Lee","Bradley Wildoer","Daniel OReilly","David Capuano","David Simmonds","Dylan Adkins","Ella Jaeger","James King","Jamie Binaisse","Jonathan Kuoch","Kavany Cheung","Kintija Jakse","Mark Kholodii","Mike Aston","Richard Falla","Ryan Pretty","Samuel Wolsgrove","Simon Collard","Steve Amos","Vincent Lee","William Lacy"],
+    14:["Alessio Ameduri","Benjamin Pike","Bradley Wildoer","Darcy Krikori","David Capuano","David Simmonds","Dylan Adkins","Ella Jaeger","Heath Dudley","Jake Davies","James Cilia","James King","Jamie Binaisse","Joe Downey","Kintija Jakse","Lucas Aquilina","Mark Carroll","Matthew Distefano","Philip James Goatcher","Richard Falla","Simon Collard","Stephen Wethling","Tyler Amor-Beale","William Lacy"]
+  },
+  "NTS Loan Labour": {
+    0:["David Simmonds"],
+    1:["Daniel OReilly","David Simmonds"],
+    2:["Alessio Ameduri","Benjamin Pike","David Simmonds"],
+    3:["Daniel OReilly","David Simmonds"],
+    5:["Daniel OReilly","David Simmonds"],
+    6:["Daniel OReilly","David Simmonds"],
+    7:["David Simmonds"],
+    8:["Daniel OReilly"],
+    9:["David Simmonds"],
+    11:["Daniel OReilly","David Simmonds"],
+    12:["Benjamin Pike","David Simmonds"],
+    13:["David Simmonds"],
+    14:["Daniel OReilly"]
+  },
+  "Punt Road Oval": {
+    0:["Christopher Tripodi","Darcy Krikori","Mitch Anderson","Nicholas Karakyriakos","Patrick McLucas"],
+    1:["Darcy Krikori","Mitch Anderson","Nicholas Karakyriakos","Patrick McLucas"],
+    2:["Alessio Ameduri","Christopher Tripodi","Darcy Krikori","Mark Carroll","Mitch Anderson","Patrick McLucas"],
+    3:["Alessio Ameduri","Christopher Tripodi","Darcy Krikori","Mark Carroll","Mitch Anderson","Patrick McLucas"],
+    4:["Alessio Ameduri","Christopher Tripodi","Darcy Krikori","Mark Carroll","Mitch Anderson"],
+    5:["Alessio Ameduri","Christopher Tripodi","Darcy Krikori","Mark Carroll","Mitch Anderson","Patrick McLucas","Simon Collard"],
+    6:["Alessio Ameduri","Darcy Krikori","Mark Carroll","Mitch Anderson","Patrick McLucas"],
+    7:["Alessio Ameduri","Darcy Krikori","Mark Carroll","Mitch Anderson","Patrick McLucas","Simon Collard"],
+    8:["Alessio Ameduri","Bradley Wildoer","Darcy Krikori","Jonathan Kuoch","Mark Carroll","Mitch Anderson","Nicholas Jacobson","Nicolas Augelli","Patrick McLucas","Simon Collard"],
+    9:["Alessio Ameduri","Darcy Krikori","Dean Bickerdike","Mark Carroll","Mitch Anderson","Nicholas Jacobson","Patrick McLucas","Simon Collard"],
+    10:["Alessio Ameduri","Darcy Krikori","Dean Bickerdike","Mark Carroll","Mitch Anderson","Nicholas Jacobson"],
+    11:["Aimee Kinnane","Alessio Ameduri","Darcy Krikori","Dean Bickerdike","James Cilia","Loretta Harradine","Mark Carroll","Mitch Anderson"],
+    12:["Aimee Kinnane","Alessio Ameduri","Darcy Krikori","Dean Bickerdike","James Cilia","Loretta Harradine","Mark Carroll","Mitch Anderson"],
+    13:["Aimee Kinnane","Alessio Ameduri","Dean Bickerdike","James Cilia","Loretta Harradine","Mark Carroll","Mitch Anderson"],
+    14:["Aimee Kinnane","Alessio Ameduri","Dean Bickerdike","James Cilia","Loretta Harradine","Mark Carroll","Mitch Anderson","Samuel Wolsgrove"]
+  },
+  "Stacked Farm": {
+    0:["Andrew Scicluna","Angus Lambert","Jake Davies","Mark Carroll","Novandro Ndoen","Orlando Lee","Steve Amos"],
+    1:["Angus Lambert","Jake Davies","Mark Carroll","Novandro Ndoen","Steve Amos","William Del Mar"],
+    2:["Andrew Scicluna","Angus Lambert","Jake Davies","Kavany Cheung","Nicholas Karakyriakos","Novandro Ndoen","Orlando Lee","Steve Amos","William Del Mar"],
+    3:["Andrew Scicluna","Angus Lambert","Jake Davies","Kavany Cheung","Nicholas Karakyriakos","Novandro Ndoen","Orlando Lee","Steve Amos","Vincent Lee","William Del Mar"],
+    4:["Andrew Scicluna","Angus Lambert","Jake Davies","Kavany Cheung","Nicholas Karakyriakos","Novandro Ndoen","Orlando Lee","Steve Amos","Trent Barrington","Vincent Lee","William Del Mar"],
+    5:["Andrew Scicluna","Angus Lambert","Jake Davies","Kavany Cheung","Nicholas Karakyriakos","Novandro Ndoen","Orlando Lee","Steve Amos","Vincent Lee","William Del Mar"],
+    6:["Andrew Scicluna","Angus Lambert","Jake Davies","Kavany Cheung","Nicholas Karakyriakos","Novandro Ndoen","Orlando Lee","Steve Amos","Vincent Lee","William Del Mar"],
+    7:["Alessio Ameduri","Andrew Scicluna","Angus Lambert","David Simmonds","Jake Davies","Jared Mills","Jarrod Grech","Kavany Cheung","Lachlan Taylor","Nathan Paris","Nicholas Karakyriakos","Novandro Ndoen","Odin Karis","Orlando Lee","Shamus Tippett","Simon Collard","Steve Amos","Vincent Lee","William Del Mar"],
+    8:["Andrew Scicluna","Angus Lambert","Jake Davies","Jared Mills","Jarrod Grech","Kavany Cheung","Lachlan Taylor","Nathan Paris","Nicholas Karakyriakos","Novandro Ndoen","Odin Karis","Orlando Lee","Shamus Tippett","Simon Collard","Steve Amos","Vincent Lee","William Del Mar","Zachary Murphy"],
+    9:["Alessio Ameduri","Andrew Scicluna","Angus Lambert","Jake Davies","Kavany Cheung","Nathan Paris","Novandro Ndoen","Odin Karis","Orlando Lee","Shamus Tippett","Simon Collard","Steve Amos","Trent Barrington","Vincent Lee","William Del Mar"],
+    10:["Alessio Ameduri","Andrew Scicluna","Angus Lambert","Jake Davies","Kavany Cheung","Nicholas Karakyriakos","Novandro Ndoen","Odin Karis","Orlando Lee","Steve Amos","Vincent Lee","William Del Mar"],
+    11:["Andrew Scicluna","Angus Lambert","Jake Davies","Kavany Cheung","Novandro Ndoen","Odin Karis","Orlando Lee","Shamus Tippett","Simon Collard","Steve Amos","Vincent Lee","William Del Mar"],
+    12:["Andrew Scicluna","Angus Lambert","Jake Davies","Kavany Cheung","Novandro Ndoen","Odin Karis","Orlando Lee","Shamus Tippett","Simon Collard","Steve Amos","Vincent Lee","William Del Mar"],
+    13:["Andrew Scicluna","Angus Lambert","Darcy Krikori","Jake Davies","Kavany Cheung","Nicholas Karakyriakos","Novandro Ndoen","Orlando Lee","Shamus Tippett","Steve Amos","William Del Mar"],
+    14:["Andrew Scicluna","Angus Lambert","Darcy Krikori","Jake Davies","Kavany Cheung","Nicholas Karakyriakos","Novandro Ndoen","Odin Karis","Orlando Lee","Shamus Tippett","Simon Collard","Steve Amos"]
+  }
+};
+
+function getEmpList(site, weekIndices) {
+  const s = new Set();
+  (Array.isArray(weekIndices) ? weekIndices : [weekIndices]).forEach(wi => {
+    if (empData[site] && empData[site][wi]) empData[site][wi].forEach(n => s.add(n));
+  });
+  return Array.from(s).sort();
+}
+
+function empRowHtml(site, emps, colspan) {
+  const id = 'emp_' + site.replace(/[^a-zA-Z0-9]/g, '_');
+  const tags = emps.map(n => `<span class="emp-tag">${n}</span>`).join('');
+  return `<tr class="emp-row" id="${id}" style="display:none"><td colspan="${colspan}"><div class="emp-tags">${tags}</div></td></tr>`;
+}
+
+function toggleEmpRow(site, btn) {
+  const id = 'emp_' + site.replace(/[^a-zA-Z0-9]/g, '_');
+  const row = document.getElementById(id);
+  if (!row) return;
+  const open = row.style.display !== 'none';
+  row.style.display = open ? 'none' : '';
+  const cnt = row.querySelectorAll('.emp-tag').length;
+  btn.textContent = (open ? '▸ ' : '▾ ') + cnt;
+}
+
+// ──────────────────────────────────────────────
 // SITE TABLE
 // ──────────────────────────────────────────────
 function buildTable(filter) {
@@ -517,8 +759,12 @@ function buildTableWeek(filter, sites) {
     const wowStr = r.wow !== null
       ? `<span style="color:${r.wow < 0 ? '#107c10' : '#d13438'}">${r.wow > 0 ? '+' : ''}${r.wow.toFixed(1)}%</span>`
       : '<span style="color:#ccc">—</span>';
+    const emps = getEmpList(r.k, [cur]);
+    const toggleBtn = emps.length > 0
+      ? `<button class="emp-toggle" onclick="toggleEmpRow('${r.k}',this)">▸ ${emps.length}</button>`
+      : '';
     return `<tr data-site="${r.k}">
-      <td>${displayName(r.k)}</td>
+      <td>${displayName(r.k)}${toggleBtn}</td>
       <td>${fH(r.hCur)}</td>
       <td>${r.cCur > 0 ? fC(r.cCur) : '<span style="color:#ccc">pending</span>'}</td>
       <td>${r.eCur}</td>
@@ -526,7 +772,7 @@ function buildTableWeek(filter, sites) {
       <td>${r.hPrv > 0 ? fH(r.hPrv) : '<span style="color:#ccc">—</span>'}</td>
       <td>${wowStr}</td>
       <td>${r.histRate > 0 ? fR(r.histRate) : '<span style="color:#ccc">—</span>'}</td>
-    </tr>`;
+    </tr>${empRowHtml(r.k, emps, 8)}`;
   }).join('');
 
   const totRate = totC > 0 && totH > 0 ? fR(totC/totH) : '—';
@@ -551,14 +797,18 @@ function buildTableMonth(filter, sites) {
   let totH = 0, totC = 0;
   $('siteTable').innerHTML = rows.map(r => {
     totH += r.h; totC += r.c;
+    const emps = getEmpList(r.k, idx);
+    const toggleBtn = emps.length > 0
+      ? `<button class="emp-toggle" onclick="toggleEmpRow('${r.k}',this)">▸ ${emps.length}</button>`
+      : '';
     return `<tr data-site="${r.k}">
-      <td>${displayName(r.k)}</td>
+      <td>${displayName(r.k)}${toggleBtn}</td>
       <td>${fH(r.h)}</td>
       <td>${r.c > 0 ? fC(r.c) : '<span style="color:#ccc">pending</span>'}</td>
       <td>${r.rate !== null ? fR(r.rate) : '<span style="color:#ccc">—</span>'}</td>
       <td>${r.avgE.toFixed(1)}</td>
       <td>${fH(r.avgH)}</td>
-    </tr>`;
+    </tr>${empRowHtml(r.k, emps, 6)}`;
   }).join('');
 
   const totRate = totC > 0 && totH > 0 ? fR(totC/totH) : '—';

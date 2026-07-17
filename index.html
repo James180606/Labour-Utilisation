@@ -123,6 +123,7 @@ tr.emp-row td { background: #f7faff !important; padding: 6px 12px 10px 24px; bor
   </select>
   <label>Period</label>
   <select id="periodSelect" onchange="onPeriodChange()">
+    <option value="all-periods">All Periods</option>
     <optgroup label="By Month">
       <option value="m:Apr">April 2026</option>
       <option value="m:May">May 2026</option>
@@ -391,6 +392,7 @@ function siteAvgRate(key) {
 function isMonthMode() { return $('periodSelect').value.startsWith('m:'); }
 function getSelectedMonth() { return $('periodSelect').value.slice(2); }
 function getCurWeekIdx() {
+  if (isAllPeriods()) return W - 1;
   if (isMonthMode()) {
     const idx = monthGroups[getSelectedMonth()];
     return idx[idx.length - 1];
@@ -399,6 +401,7 @@ function getCurWeekIdx() {
 }
 function getPrvWeekIdx() { const ci = getCurWeekIdx(); return ci > 0 ? ci - 1 : null; }
 function getSiteKey()    { return $('siteSelect').value; }
+function isAllPeriods()  { return $('periodSelect').value === 'all-periods'; }
 function getChartMode()  { return $('chartModeSelect').value; }
 function onChartModeChange() { buildWeeklyChart(getSiteKey()); }
 
@@ -459,8 +462,8 @@ function buildWeeklyChart(siteKey) {
     chartLabels = monthOrder.map(m => monthFull[m] + ' 2026');
     chartData = monthOrder.map(m => monthGroups[m].reduce((s, i) => s + fullData[i], 0));
     const selMonth = isMonthMode() ? getSelectedMonth() : null;
-    bgColors = monthOrder.map(m => (selMonth ? m === selMonth : m === monthOrder[monthOrder.length - 1]) ? color : color + '66');
-    borders  = monthOrder.map(m => (selMonth ? m === selMonth : m === monthOrder[monthOrder.length - 1]) ? color : color + '99');
+    bgColors = monthOrder.map(m => (!selMonth || m === selMonth) ? color : color + '66');
+    borders  = monthOrder.map(m => (!selMonth || m === selMonth) ? color : color + '99');
     $('weeklyChartTitle').innerHTML = `Monthly Labour Hours — ${siteStr} <span>April – July 2026</span>`;
     tooltipCb = c => {
       const m = monthOrder[c.dataIndex];
@@ -472,12 +475,12 @@ function buildWeeklyChart(siteKey) {
     };
     yLabel = 'Hours';
   } else if (chartMode === 'total') {
-    const vis = isMonthMode() ? monthGroups[getSelectedMonth()] : [getCurWeekIdx()];
+    const vis = isAllPeriods() ? weeks.map((_,i) => i) : isMonthMode() ? monthGroups[getSelectedMonth()] : [getCurWeekIdx()];
     chartLabels = vis.map(i => weeks[i]);
     chartData   = vis.map(i => fullData[i]);
     const totalH = chartData.reduce((s, h) => s + h, 0);
     const totalC = vis.reduce((s, i) => s + fullCost[i], 0);
-    const periodStr = isMonthMode() ? `${monthFull[getSelectedMonth()]} 2026` : `w/e ${weeks[vis[0]]}`;
+    const periodStr = isAllPeriods() ? 'Apr – Jul 2026' : isMonthMode() ? `${monthFull[getSelectedMonth()]} 2026` : `w/e ${weeks[vis[0]]}`;
     bgColors = chartData.map(() => color);
     borders  = chartData.map(() => color);
     $('weeklyChartTitle').innerHTML = `Total Labour Hours — ${siteStr} <span>${periodStr} · ${fH(totalH)} hrs · ${totalC > 0 ? fK(totalC) : 'cost pending'}</span>`;
@@ -501,8 +504,8 @@ function buildWeeklyChart(siteKey) {
       ? `${monthFull[getSelectedMonth()]} 2026 · week ending Sunday`
       : '5 Apr – 12 Jul 2026 · week ending Sunday';
     $('weeklyChartTitle').innerHTML = `Weekly Labour Hours — ${siteStr} <span>${rangeStr}</span>`;
-    bgColors = chartData.map((_, j) => vis[j] === curIdx ? color : color + '66');
-    borders  = chartData.map((_, j) => vis[j] === curIdx ? color : color + '99');
+    bgColors = chartData.map((_, j) => (isAllPeriods() || vis[j] === curIdx) ? color : color + '66');
+    borders  = chartData.map((_, j) => (isAllPeriods() || vis[j] === curIdx) ? color : color + '99');
     tooltipCb = c => {
       const i = vis[c.dataIndex];
       const h = c.raw;
@@ -532,6 +535,40 @@ function buildWeeklyChart(siteKey) {
       }
     }
   });
+}
+
+function buildTableAll(filter, sites) {
+  const allIdx = weeks.map((_,i) => i);
+  $('tableTitle').innerHTML = `Site Detail — All Periods <span>5 Apr – 12 Jul 2026 · ${W} weeks · costs from timesheet export</span>`;
+  $('siteTableHead').innerHTML = `<tr><th>Site</th><th>Total Hours</th><th>Total Cost</th><th>Avg Rate</th><th>Avg Emps / Week</th><th>Avg Weekly Hrs</th></tr>`;
+
+  const rows = sites.map(k => {
+    let h = 0, c = 0, eSum = 0;
+    allIdx.forEach(i => { h += raw[k].h[i]; c += raw[k].c[i]; eSum += raw[k].e[i]; });
+    return { k, h, c, avgE: eSum / W, avgH: h / W, rate: h > 0 && c > 0 ? c / h : null };
+  }).sort((a, b) => b.h - a.h);
+
+  let totH = 0, totC = 0;
+  $('siteTable').innerHTML = rows.map(r => {
+    totH += r.h; totC += r.c;
+    const emps = getEmpList(r.k, allIdx);
+    const toggleBtn = emps.length > 0
+      ? `<button class="emp-toggle" onclick="toggleEmpRow('${r.k}',this)">▸ ${emps.length}</button>`
+      : '';
+    return `<tr data-site="${r.k}">
+      <td>${displayName(r.k)}${toggleBtn}</td>
+      <td>${fH(r.h)}</td>
+      <td>${r.c > 0 ? fC(r.c) : '<span style="color:#ccc">pending</span>'}</td>
+      <td>${r.rate !== null ? fR(r.rate) : '<span style="color:#ccc">—</span>'}</td>
+      <td>${r.avgE.toFixed(1)}</td>
+      <td>${fH(r.avgH)}</td>
+    </tr>${empRowHtml(r.k, emps, 6)}`;
+  }).join('');
+
+  const totRate = totC > 0 && totH > 0 ? fR(totC / totH) : '—';
+  const totAvgH = totH / W;
+  let totAvgE = 0; rows.forEach(r => totAvgE += r.avgE);
+  $('siteTableFoot').innerHTML = `<tr><td>TOTAL</td><td>${fH(totH)}</td><td>${totC > 0 ? fC(totC) : 'pending'}</td><td>${totRate}</td><td>${totAvgE.toFixed(1)}</td><td>${fH(totAvgH)}</td></tr>`;
 }
 
 // ──────────────────────────────────────────────
@@ -772,14 +809,10 @@ function toggleEmpRow(site, btn) {
 // SITE TABLE
 // ──────────────────────────────────────────────
 function buildTable(filter) {
-  const monthMode = isMonthMode();
   const sites = siteNames.filter(k => filter === 'all' || k === filter);
-
-  if (monthMode) {
-    buildTableMonth(filter, sites);
-  } else {
-    buildTableWeek(filter, sites);
-  }
+  if (isAllPeriods())   buildTableAll(filter, sites);
+  else if (isMonthMode()) buildTableMonth(filter, sites);
+  else                    buildTableWeek(filter, sites);
 }
 
 function buildTableWeek(filter, sites) {
@@ -865,8 +898,36 @@ function buildTableMonth(filter, sites) {
 // KPI CARDS
 // ──────────────────────────────────────────────
 function updateKpis(siteKey) {
-  const monthMode = isMonthMode();
   const isAll = siteKey === 'all';
+
+  if (isAllPeriods()) {
+    let totH = 0, totC = 0, eSum = 0;
+    weeks.forEach((_, i) => {
+      totH += isAll ? fleetHours[i] : raw[siteKey].h[i];
+      totC += isAll ? fleetCost[i]  : raw[siteKey].c[i];
+      eSum += isAll ? fleetEmps[i]  : raw[siteKey].e[i];
+    });
+    const rate = totH > 0 && totC > 0 ? totC / totH : null;
+    const hArr = isAll ? fleetHours : raw[siteKey].h;
+    const peakIdx = hArr.indexOf(Math.max(...hArr));
+    $('headerBadge').textContent = 'Apr – Jul 2026';
+    $('kpi-hours-label').textContent = 'Total Hours';
+    $('kpi-hours').textContent = fH(totH);
+    $('kpi-hours-sub').textContent = (isAll ? 'all sites · ' : displayName(siteKey) + ' · ') + '15 weeks';
+    $('kpi-emps-label').textContent = 'Avg Employees / Week';
+    $('kpi-emps').textContent = (eSum / W).toFixed(1);
+    $('kpi-emps-sub').textContent = 'average per week all time';
+    $('kpi-cost').textContent = totC > 0 ? fK(totC) : '—';
+    $('kpi-cost-sub').textContent = 'total all periods';
+    $('kpi-rate').textContent = rate !== null ? fR(rate) : '—';
+    $('kpi-rate-sub').textContent = 'all-time avg rate';
+    $('kpi-change-label').textContent = 'Peak Week';
+    $('kpi-wow').textContent = fH(hArr[peakIdx]) + 'h';
+    $('kpi-wow-sub').textContent = 'w/e ' + weeks[peakIdx];
+    return;
+  }
+
+  const monthMode = isMonthMode();
 
   if (monthMode) {
     const month = getSelectedMonth();
@@ -1001,20 +1062,21 @@ function updateMom(siteKey) {
 // REBUILD ALL
 // ──────────────────────────────────────────────
 function rebuildAll() {
-  const site      = getSiteKey();
-  const isAll     = site === 'all';
-  const monthMode = isMonthMode();
+  const site       = getSiteKey();
+  const isAll      = site === 'all';
+  const monthMode  = isMonthMode();
+  const allPeriods = isAllPeriods();
 
   // Show/hide WoW and MoM sections
-  $('wowSection').style.display = monthMode ? 'none' : 'block';
-  $('momSection').style.display = monthMode ? 'block' : 'none';
+  $('wowSection').style.display = (!allPeriods && !monthMode) ? 'block' : 'none';
+  $('momSection').style.display = (!allPeriods && monthMode)  ? 'block' : 'none';
 
   buildWeeklyChart(site);
   buildTable(site);
   updateKpis(site);
-  if (monthMode) updateMom(site);
+  if (!allPeriods && monthMode) updateMom(site);
 
-  const period = monthMode ? monthFull[getSelectedMonth()] + ' 2026' : 'week ending ' + weeks[getCurWeekIdx()];
+  const period = allPeriods ? 'all periods' : monthMode ? monthFull[getSelectedMonth()] + ' 2026' : 'week ending ' + weeks[getCurWeekIdx()];
   $('toolbarMeta').textContent = isAll
     ? `15 weeks of data · 13 sites · ${period}`
     : `${displayName(site)} · ${period}`;

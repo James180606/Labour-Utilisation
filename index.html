@@ -183,7 +183,14 @@ tr.emp-row td { background: #f7faff !important; padding: 6px 12px 10px 24px; bor
 
   <!-- RUNNING WEEKLY HOURS CHART -->
   <div class="card">
-    <div class="card-title" id="weeklyChartTitle">Weekly Labour Hours — All Sites (Fleet Total) <span>5 Apr – 12 Jul 2026 · week ending Sunday</span></div>
+    <div class="card-title" style="display:flex;justify-content:space-between;align-items:center;">
+      <span id="weeklyChartTitle">Weekly Labour Hours — All Sites (Fleet Total) <span>5 Apr – 12 Jul 2026 · week ending Sunday</span></span>
+      <select id="chartModeSelect" onchange="onChartModeChange()" style="font-size:12px;font-family:'Segoe UI',sans-serif;padding:4px 10px;border:1px solid #ccc;border-radius:4px;background:white;cursor:pointer;margin-left:12px;flex-shrink:0;">
+        <option value="weekly">Weekly</option>
+        <option value="monthly">Monthly</option>
+        <option value="total">Total (Cumulative)</option>
+      </select>
+    </div>
     <div class="chart-wrap" style="height:320px"><canvas id="weeklyChart"></canvas></div>
   </div>
 
@@ -392,6 +399,8 @@ function getCurWeekIdx() {
 }
 function getPrvWeekIdx() { const ci = getCurWeekIdx(); return ci > 0 ? ci - 1 : null; }
 function getSiteKey()    { return $('siteSelect').value; }
+function getChartMode()  { return $('chartModeSelect').value; }
+function onChartModeChange() { buildWeeklyChart(getSiteKey()); }
 
 // Aggregate totals for a month
 function monthTotals(month, siteKey) {
@@ -434,29 +443,71 @@ let weeklyChart = null;
 function buildWeeklyChart(siteKey) {
   if (weeklyChart) { weeklyChart.destroy(); weeklyChart = null; }
 
-  const monthMode = isMonthMode();
-  const curIdx = getCurWeekIdx();
-  let fullData, label, color;
+  const chartMode = getChartMode();
+  let fullData, fullCost, label, color;
 
   if (siteKey === 'all') {
-    fullData = fleetHours; label = 'Fleet Total Hours'; color = '#0078d4';
+    fullData = fleetHours; fullCost = fleetCost; label = 'Fleet Total Hours'; color = '#0078d4';
   } else {
-    fullData = raw[siteKey].h; label = displayName(siteKey); color = siteColors[siteKey] || '#0078d4';
+    fullData = raw[siteKey].h; fullCost = raw[siteKey].c; label = displayName(siteKey); color = siteColors[siteKey] || '#0078d4';
   }
 
-  // Month mode: show only that month's weeks. Week mode: show all weeks.
-  const vis = monthMode ? monthGroups[getSelectedMonth()] : weeks.map((_,i) => i);
-  const chartLabels = vis.map(i => weeks[i]);
-  const chartData   = vis.map(i => fullData[i]);
-
   const siteStr = siteKey === 'all' ? 'All Sites (Fleet Total)' : displayName(siteKey);
-  const rangeStr = monthMode
-    ? `${monthFull[getSelectedMonth()]} 2026 · week ending Sunday`
-    : '5 Apr – 12 Jul 2026 · week ending Sunday';
-  $('weeklyChartTitle').innerHTML = `Weekly Labour Hours — ${siteStr} <span>${rangeStr}</span>`;
+  let chartLabels, chartData, bgColors, borders, tooltipCb, yLabel;
 
-  const bgColors = chartData.map((_, j) => vis[j] === curIdx ? color : color + '66');
-  const borders  = chartData.map((_, j) => vis[j] === curIdx ? color : color + '99');
+  if (chartMode === 'monthly') {
+    chartLabels = monthOrder.map(m => monthFull[m] + ' 2026');
+    chartData = monthOrder.map(m => monthGroups[m].reduce((s, i) => s + fullData[i], 0));
+    const selMonth = isMonthMode() ? getSelectedMonth() : null;
+    bgColors = monthOrder.map(m => (selMonth ? m === selMonth : m === monthOrder[monthOrder.length - 1]) ? color : color + '66');
+    borders  = monthOrder.map(m => (selMonth ? m === selMonth : m === monthOrder[monthOrder.length - 1]) ? color : color + '99');
+    $('weeklyChartTitle').innerHTML = `Monthly Labour Hours — ${siteStr} <span>April – July 2026</span>`;
+    tooltipCb = c => {
+      const m = monthOrder[c.dataIndex];
+      const idx = monthGroups[m];
+      const h = c.raw;
+      const tc = idx.reduce((s, i) => s + fullCost[i], 0);
+      const rate = tc > 0 && h > 0 ? (tc / h).toFixed(2) : '—';
+      return [` ${fH(h)} hrs`, tc > 0 ? ` ${fK(tc)} total cost` : ' cost pending', ` $${rate}/h avg rate`, ` ${idx.length} weeks`];
+    };
+    yLabel = 'Hours';
+  } else if (chartMode === 'total') {
+    chartLabels = weeks.slice();
+    let running = 0;
+    chartData = fullData.map(h => { running += h; return running; });
+    bgColors = chartData.map((_, j) => j === chartData.length - 1 ? color : color + '66');
+    borders  = chartData.map((_, j) => j === chartData.length - 1 ? color : color + '99');
+    $('weeklyChartTitle').innerHTML = `Cumulative Labour Hours — ${siteStr} <span>5 Apr – 12 Jul 2026 · running total</span>`;
+    tooltipCb = c => {
+      const i = c.dataIndex;
+      const wh = fullData[i];
+      let cumC = 0; for (let j = 0; j <= i; j++) cumC += fullCost[j];
+      return [` Cumulative: ${fH(c.raw)} hrs`, ` This week: ${fH(wh)} hrs`, cumC > 0 ? ` Total cost to date: ${fK(cumC)}` : ''];
+    };
+    yLabel = 'Cumulative Hours';
+  } else {
+    // Weekly
+    const monthMode = isMonthMode();
+    const curIdx = getCurWeekIdx();
+    const vis = monthMode ? monthGroups[getSelectedMonth()] : weeks.map((_,i) => i);
+    chartLabels = vis.map(i => weeks[i]);
+    chartData   = vis.map(i => fullData[i]);
+    const rangeStr = monthMode
+      ? `${monthFull[getSelectedMonth()]} 2026 · week ending Sunday`
+      : '5 Apr – 12 Jul 2026 · week ending Sunday';
+    $('weeklyChartTitle').innerHTML = `Weekly Labour Hours — ${siteStr} <span>${rangeStr}</span>`;
+    bgColors = chartData.map((_, j) => vis[j] === curIdx ? color : color + '66');
+    borders  = chartData.map((_, j) => vis[j] === curIdx ? color : color + '99');
+    tooltipCb = c => {
+      const i = vis[c.dataIndex];
+      const h = c.raw;
+      const cost = fullCost[i];
+      const rate = cost > 0 && h > 0 ? (cost/h).toFixed(2) : '—';
+      const e = siteKey === 'all' ? fleetEmps[i] : raw[siteKey].e[i];
+      return [` ${fH(h)} hrs`, cost > 0 ? ` ${fK(cost)} cost` : ' cost pending', ` $${rate}/h`, ` ${e} employees`];
+    };
+    yLabel = 'Hours';
+  }
 
   weeklyChart = new Chart($('weeklyChart').getContext('2d'), {
     type: 'bar',
@@ -468,22 +519,11 @@ function buildWeeklyChart(siteKey) {
       responsive: true, maintainAspectRatio: false,
       plugins: {
         legend: { display: false },
-        tooltip: {
-          callbacks: {
-            label: c => {
-              const i = vis[c.dataIndex];
-              const h = c.raw;
-              const cost = siteKey === 'all' ? fleetCost[i] : raw[siteKey].c[i];
-              const rate = cost > 0 && h > 0 ? (cost/h).toFixed(2) : '—';
-              const e = siteKey === 'all' ? fleetEmps[i] : raw[siteKey].e[i];
-              return [` ${fH(h)} hrs`, cost > 0 ? ` ${fK(cost)} cost` : ' cost pending', ` $${rate}/h`, ` ${e} employees`];
-            }
-          }
-        }
+        tooltip: { callbacks: { label: tooltipCb } }
       },
       scales: {
         x: { grid: { display: false }, ticks: { font: { size: 10 } } },
-        y: { ticks: { callback: v => v + 'h', font: { size: 10 } }, grid: { color: '#f0f0f0' }, title: { display: true, text: 'Hours', font: { size: 10 }, color: '#888' } }
+        y: { ticks: { callback: v => v + 'h', font: { size: 10 } }, grid: { color: '#f0f0f0' }, title: { display: true, text: yLabel, font: { size: 10 }, color: '#888' } }
       }
     }
   });

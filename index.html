@@ -206,6 +206,40 @@ tfoot td:first-child { text-align: left; }
     </div>
   </div>
 
+  <!-- MOM TREND CARDS -->
+  <div class="section-label" style="margin-top:20px">Month on Month <span id="momSectionLabel"></span></div>
+  <div class="wow-row">
+    <div class="wow-card">
+      <div class="wow-label">Total Hours</div>
+      <div class="wow-prev" id="mom-hours-prev">—</div>
+      <div class="wow-curr" id="mom-hours-curr">—</div>
+      <div class="wow-delta" id="mom-hours-delta">—</div>
+    </div>
+    <div class="wow-card">
+      <div class="wow-label">Labour Cost</div>
+      <div class="wow-prev" id="mom-cost-prev">—</div>
+      <div class="wow-curr" id="mom-cost-curr">—</div>
+      <div class="wow-delta" id="mom-cost-delta">—</div>
+    </div>
+    <div class="wow-card">
+      <div class="wow-label">Avg Hourly Rate</div>
+      <div class="wow-prev" id="mom-rate-prev">—</div>
+      <div class="wow-curr" id="mom-rate-curr">—</div>
+      <div class="wow-delta" id="mom-rate-delta">—</div>
+    </div>
+    <div class="wow-card">
+      <div class="wow-label">Avg Employees / Week</div>
+      <div class="wow-prev" id="mom-emps-prev">—</div>
+      <div class="wow-curr" id="mom-emps-curr">—</div>
+      <div class="wow-delta" id="mom-emps-delta">—</div>
+    </div>
+    <div class="wow-card">
+      <div class="wow-label">Avg Weekly Hours</div>
+      <div class="wow-prev" id="mom-avgh-prev">—</div>
+      <div class="wow-curr" id="mom-avgh-curr">—</div>
+      <div class="wow-delta" id="mom-avgh-delta">—</div>
+    </div>
+  </div>
 
   <!-- FULL SITE TABLE -->
   <div class="card" style="margin-top:20px">
@@ -343,6 +377,29 @@ function siteAvgRate(key) {
 }
 
 const displayName = k => k === "Northside Electrical Contractors" ? "Admin / Office" : k;
+
+// Month groupings (indices into weeks[])
+const monthGroups = { 'Apr':[0,1,2,3], 'May':[4,5,6,7,8], 'Jun':[9,10,11,12], 'Jul':[13,14] };
+const monthOrder  = ['Apr','May','Jun','Jul'];
+const monthFull   = { 'Apr':'April', 'May':'May', 'Jun':'June', 'Jul':'July' };
+
+function getActiveMonth() {
+  const m = getMonthFilter();
+  return m !== 'all' ? m : weekMonth[getCurIdx()];
+}
+
+function monthTotals(month, siteKey) {
+  const idx = monthGroups[month];
+  if (!idx) return null;
+  const isAll = siteKey === 'all';
+  let h = 0, c = 0, eSum = 0;
+  idx.forEach(i => {
+    h    += isAll ? fleetHours[i] : raw[siteKey].h[i];
+    c    += isAll ? fleetCost[i]  : raw[siteKey].c[i];
+    eSum += isAll ? fleetEmps[i]  : raw[siteKey].e[i];
+  });
+  return { h, c, eSum, avgE: eSum / idx.length, avgH: h / idx.length, rate: h > 0 && c > 0 ? c/h : null, weeks: idx.length };
+}
 
 // Read current selections
 function getCurIdx() { return parseInt($('weekSelect').value, 10); }
@@ -629,6 +686,48 @@ function updateKpis(siteKey) {
 }
 
 // ──────────────────────────────────────────────
+// MONTH ON MONTH
+// ──────────────────────────────────────────────
+function updateMom(siteKey) {
+  const curMonth = getActiveMonth();
+  const curIdx   = monthOrder.indexOf(curMonth);
+  const prvMonth = curIdx > 0 ? monthOrder[curIdx - 1] : null;
+
+  const cur = monthTotals(curMonth, siteKey);
+  const prv = prvMonth ? monthTotals(prvMonth, siteKey) : null;
+
+  const siteLabel = siteKey === 'all' ? '(fleet)' : `(${displayName(siteKey)})`;
+  $('momSectionLabel').textContent = prv
+    ? ` · ${monthFull[prvMonth]} vs ${monthFull[curMonth]} 2026 ${siteLabel}`
+    : ` · ${monthFull[curMonth]} 2026 ${siteLabel} · no prior month`;
+
+  function momCard(prevId, currId, deltaId, prevVal, currVal, fmt, higherIsGood) {
+    $(prevId).textContent = prevVal !== null ? fmt(prevVal) : '—';
+    $(currId).textContent = currVal !== null ? fmt(currVal) : '—';
+    if (prevVal !== null && currVal !== null && prevVal > 0) {
+      const d = pct(currVal, prevVal);
+      const cls = higherIsGood ? (d >= 0 ? 'pos-good' : 'neg-bad') : (d >= 0 ? 'pos-bad' : 'neg-good');
+      $(deltaId).className = 'wow-delta ' + cls;
+      $(deltaId).textContent = (d >= 0 ? '↑ +' : '↓ ') + d.toFixed(1) + '%';
+    } else {
+      $(deltaId).textContent = '—';
+      $(deltaId).className = 'wow-delta neutral';
+    }
+  }
+
+  momCard('mom-hours-prev','mom-hours-curr','mom-hours-delta',
+    prv ? prv.h    : null, cur.h,    v => fH(v) + ' hrs', true);
+  momCard('mom-cost-prev', 'mom-cost-curr', 'mom-cost-delta',
+    prv ? prv.c    : null, cur.c,    v => '$' + (v/1000).toFixed(1) + 'K', false);
+  momCard('mom-rate-prev', 'mom-rate-curr', 'mom-rate-delta',
+    prv ? prv.rate : null, cur.rate, v => v !== null ? fR(v) : '—', false);
+  momCard('mom-emps-prev', 'mom-emps-curr', 'mom-emps-delta',
+    prv ? prv.avgE : null, cur.avgE, v => v.toFixed(1), true);
+  momCard('mom-avgh-prev', 'mom-avgh-curr', 'mom-avgh-delta',
+    prv ? prv.avgH : null, cur.avgH, v => fH(v) + ' hrs', true);
+}
+
+// ──────────────────────────────────────────────
 // REBUILD ALL (called by both dropdowns)
 // ──────────────────────────────────────────────
 function rebuildAll() {
@@ -638,6 +737,7 @@ function rebuildAll() {
   buildWeeklyChart(site);
   buildTable(site);
   updateKpis(site);
+  updateMom(site);
 
   const cur = getCurIdx();
   $('toolbarMeta').textContent = isAll

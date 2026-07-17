@@ -27,9 +27,8 @@ body { font-family: 'Segoe UI', sans-serif; background: #f3f2f1; color: #252423;
   padding: 7px 14px; border: 1px solid #ccc; border-radius: 4px;
   background: white; cursor: pointer;
 }
-.toolbar select#siteSelect  { min-width: 240px; }
-.toolbar select#monthSelect { min-width: 130px; }
-.toolbar select#weekSelect  { min-width: 160px; }
+.toolbar select#siteSelect    { min-width: 240px; }
+.toolbar select#periodSelect  { min-width: 180px; }
 .toolbar select:focus { outline: 2px solid #0078d4; }
 .toolbar .meta { font-size: 12px; color: #999; margin-left: auto; }
 
@@ -58,8 +57,7 @@ body { font-family: 'Segoe UI', sans-serif; background: #f3f2f1; color: #252423;
 .card-title span { font-size: 11px; font-weight: 400; color: #888; margin-left: 6px; }
 .chart-wrap { position: relative; }
 
-
-/* WOW CARDS */
+/* WOW / MOM CARDS */
 .wow-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; margin-bottom: 20px; }
 .wow-card { background: white; border-radius: 6px; padding: 14px 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); text-align: center; }
 .wow-label { font-size: 10px; text-transform: uppercase; color: #888; letter-spacing: 0.4px; font-weight: 600; margin-bottom: 6px; }
@@ -85,8 +83,6 @@ td:first-child { text-align: left; color: #1a1a2e; font-weight: 500; }
 tfoot td { font-weight: 700; background: #1a1a2e; color: white; padding: 9px 12px; }
 tfoot td:first-child { text-align: left; }
 .cell-zero { color: #ccc; }
-.badge-red   { background: #fde8e8; color: #d13438; font-size: 9px; font-weight: 700; padding: 2px 5px; border-radius: 3px; margin-left: 5px; white-space: nowrap; }
-.badge-green { background: #e8f5e9; color: #107c10; font-size: 9px; font-weight: 700; padding: 2px 5px; border-radius: 3px; margin-left: 5px; white-space: nowrap; }
 
 .footer { text-align: center; font-size: 11px; color: #aaa; padding: 14px; margin-top: 4px; }
 </style>
@@ -98,7 +94,7 @@ tfoot td:first-child { text-align: left; }
     <h1>Labour Utilisation Dashboard</h1>
     <div class="subtitle">Northside Electrical Contractors &nbsp;|&nbsp; Source: Timesheet Export &nbsp;|&nbsp; 5 Apr – 12 Jul 2026</div>
   </div>
-  <div class="date-badge" id="headerBadge">Week ending Sun 12 Jul 2026</div>
+  <div class="date-badge" id="headerBadge">July 2026</div>
 </div>
 
 <div class="toolbar">
@@ -119,17 +115,31 @@ tfoot td:first-child { text-align: left; }
     <option value="Punt Road Oval">Punt Road Oval</option>
     <option value="Stacked Farm">Stacked Farm</option>
   </select>
-  <label>Month</label>
-  <select id="monthSelect" onchange="onMonthChange()">
-    <option value="all">All Months</option>
-    <option value="Apr">April 2026</option>
-    <option value="May">May 2026</option>
-    <option value="Jun">June 2026</option>
-    <option value="Jul">July 2026</option>
-  </select>
-  <label>Week Ending</label>
-  <select id="weekSelect" onchange="onWeekChange()">
-    <!-- populated by JS -->
+  <label>Period</label>
+  <select id="periodSelect" onchange="onPeriodChange()">
+    <optgroup label="By Month">
+      <option value="m:Apr">April 2026</option>
+      <option value="m:May">May 2026</option>
+      <option value="m:Jun">June 2026</option>
+      <option value="m:Jul" selected>July 2026</option>
+    </optgroup>
+    <optgroup label="By Week">
+      <option value="w:0">Sun 5 Apr</option>
+      <option value="w:1">Sun 12 Apr</option>
+      <option value="w:2">Sun 19 Apr</option>
+      <option value="w:3">Sun 26 Apr</option>
+      <option value="w:4">Sun 3 May</option>
+      <option value="w:5">Sun 10 May</option>
+      <option value="w:6">Sun 17 May</option>
+      <option value="w:7">Sun 24 May</option>
+      <option value="w:8">Sun 31 May</option>
+      <option value="w:9">Sun 7 Jun</option>
+      <option value="w:10">Sun 14 Jun</option>
+      <option value="w:11">Sun 21 Jun</option>
+      <option value="w:12">Sun 28 Jun</option>
+      <option value="w:13">Sun 5 Jul</option>
+      <option value="w:14">Sun 12 Jul</option>
+    </optgroup>
   </select>
   <span class="meta" id="toolbarMeta">15 weeks of data · 13 sites · costs from timesheet export</span>
 </div>
@@ -139,29 +149,29 @@ tfoot td:first-child { text-align: left; }
   <!-- KPI CARDS -->
   <div class="kpi-row">
     <div class="kpi-card dark">
-      <div class="kpi-label">Hours (Selected Week)</div>
+      <div class="kpi-label" id="kpi-hours-label">Total Hours</div>
       <div class="kpi-value" id="kpi-hours">—</div>
       <div class="kpi-sub" id="kpi-hours-sub">loading…</div>
     </div>
     <div class="kpi-card blue">
-      <div class="kpi-label">Employees on Site</div>
+      <div class="kpi-label" id="kpi-emps-label">Employees on Site</div>
       <div class="kpi-value" id="kpi-emps">—</div>
-      <div class="kpi-sub" id="kpi-emps-sub">selected week</div>
+      <div class="kpi-sub" id="kpi-emps-sub">selected period</div>
     </div>
     <div class="kpi-card green">
       <div class="kpi-label">Labour Cost</div>
       <div class="kpi-value" id="kpi-cost">—</div>
-      <div class="kpi-sub" id="kpi-cost-sub">selected week</div>
+      <div class="kpi-sub" id="kpi-cost-sub">selected period</div>
     </div>
     <div class="kpi-card amber">
       <div class="kpi-label">Avg Hourly Rate</div>
       <div class="kpi-value" id="kpi-rate">—</div>
-      <div class="kpi-sub" id="kpi-rate-sub">selected week</div>
+      <div class="kpi-sub" id="kpi-rate-sub">selected period</div>
     </div>
     <div class="kpi-card red">
-      <div class="kpi-label">WoW Hours Change</div>
+      <div class="kpi-label" id="kpi-change-label">Hours Change</div>
       <div class="kpi-value" id="kpi-wow">—</div>
-      <div class="kpi-sub" id="kpi-wow-sub">vs previous week</div>
+      <div class="kpi-sub" id="kpi-wow-sub">vs prior period</div>
     </div>
   </div>
 
@@ -171,106 +181,88 @@ tfoot td:first-child { text-align: left; }
     <div class="chart-wrap" style="height:320px"><canvas id="weeklyChart"></canvas></div>
   </div>
 
-  <!-- WOW TREND CARDS -->
-  <div class="section-label">Week-on-Week <span id="wowSectionLabel">&nbsp;·&nbsp; week ending 5 Jul vs 12 Jul 2026</span></div>
-  <div class="wow-row">
-    <div class="wow-card">
-      <div class="wow-label">Total Hours</div>
-      <div class="wow-prev" id="wow-hours-prev">—</div>
-      <div class="wow-curr" id="wow-hours-curr">—</div>
-      <div class="wow-delta" id="wow-hours-delta">—</div>
-    </div>
-    <div class="wow-card">
-      <div class="wow-label">Labour Cost</div>
-      <div class="wow-prev" id="wow-cost-prev">—</div>
-      <div class="wow-curr" id="wow-cost-curr">—</div>
-      <div class="wow-delta" id="wow-cost-delta">—</div>
-    </div>
-    <div class="wow-card">
-      <div class="wow-label">Avg Hourly Rate</div>
-      <div class="wow-prev" id="wow-rate-prev">—</div>
-      <div class="wow-curr" id="wow-rate-curr">—</div>
-      <div class="wow-delta" id="wow-rate-delta">—</div>
-    </div>
-    <div class="wow-card">
-      <div class="wow-label">Employees</div>
-      <div class="wow-prev" id="wow-emps-prev">—</div>
-      <div class="wow-curr" id="wow-emps-curr">—</div>
-      <div class="wow-delta" id="wow-emps-delta">—</div>
-    </div>
-    <div class="wow-card">
-      <div class="wow-label">Peak Week (Hours)</div>
-      <div class="wow-prev" style="color:#1a1a2e;font-size:12px;font-weight:600;" id="wow-peak-label">—</div>
-      <div class="wow-curr" id="wow-peak-hrs">—</div>
-      <div class="wow-delta neutral" id="wow-peak-sub">historical peak</div>
+  <!-- WOW TREND CARDS (week mode only) -->
+  <div id="wowSection">
+    <div class="section-label">Week-on-Week <span id="wowSectionLabel"></span></div>
+    <div class="wow-row">
+      <div class="wow-card">
+        <div class="wow-label">Total Hours</div>
+        <div class="wow-prev" id="wow-hours-prev">—</div>
+        <div class="wow-curr" id="wow-hours-curr">—</div>
+        <div class="wow-delta" id="wow-hours-delta">—</div>
+      </div>
+      <div class="wow-card">
+        <div class="wow-label">Labour Cost</div>
+        <div class="wow-prev" id="wow-cost-prev">—</div>
+        <div class="wow-curr" id="wow-cost-curr">—</div>
+        <div class="wow-delta" id="wow-cost-delta">—</div>
+      </div>
+      <div class="wow-card">
+        <div class="wow-label">Avg Hourly Rate</div>
+        <div class="wow-prev" id="wow-rate-prev">—</div>
+        <div class="wow-curr" id="wow-rate-curr">—</div>
+        <div class="wow-delta" id="wow-rate-delta">—</div>
+      </div>
+      <div class="wow-card">
+        <div class="wow-label">Employees</div>
+        <div class="wow-prev" id="wow-emps-prev">—</div>
+        <div class="wow-curr" id="wow-emps-curr">—</div>
+        <div class="wow-delta" id="wow-emps-delta">—</div>
+      </div>
+      <div class="wow-card">
+        <div class="wow-label">Peak Week (Hours)</div>
+        <div class="wow-prev" style="color:#1a1a2e;font-size:12px;font-weight:600;" id="wow-peak-label">—</div>
+        <div class="wow-curr" id="wow-peak-hrs">—</div>
+        <div class="wow-delta neutral" id="wow-peak-sub">historical peak</div>
+      </div>
     </div>
   </div>
 
-  <!-- MOM TREND CARDS -->
-  <div class="section-label" style="margin-top:20px">Month on Month <span id="momSectionLabel"></span></div>
-  <div class="wow-row">
-    <div class="wow-card">
-      <div class="wow-label">Total Hours</div>
-      <div class="wow-prev" id="mom-hours-prev">—</div>
-      <div class="wow-curr" id="mom-hours-curr">—</div>
-      <div class="wow-delta" id="mom-hours-delta">—</div>
-    </div>
-    <div class="wow-card">
-      <div class="wow-label">Labour Cost</div>
-      <div class="wow-prev" id="mom-cost-prev">—</div>
-      <div class="wow-curr" id="mom-cost-curr">—</div>
-      <div class="wow-delta" id="mom-cost-delta">—</div>
-    </div>
-    <div class="wow-card">
-      <div class="wow-label">Avg Hourly Rate</div>
-      <div class="wow-prev" id="mom-rate-prev">—</div>
-      <div class="wow-curr" id="mom-rate-curr">—</div>
-      <div class="wow-delta" id="mom-rate-delta">—</div>
-    </div>
-    <div class="wow-card">
-      <div class="wow-label">Avg Employees / Week</div>
-      <div class="wow-prev" id="mom-emps-prev">—</div>
-      <div class="wow-curr" id="mom-emps-curr">—</div>
-      <div class="wow-delta" id="mom-emps-delta">—</div>
-    </div>
-    <div class="wow-card">
-      <div class="wow-label">Avg Weekly Hours</div>
-      <div class="wow-prev" id="mom-avgh-prev">—</div>
-      <div class="wow-curr" id="mom-avgh-curr">—</div>
-      <div class="wow-delta" id="mom-avgh-delta">—</div>
+  <!-- MOM TREND CARDS (month mode only) -->
+  <div id="momSection">
+    <div class="section-label">Month on Month <span id="momSectionLabel"></span></div>
+    <div class="wow-row">
+      <div class="wow-card">
+        <div class="wow-label">Total Hours</div>
+        <div class="wow-prev" id="mom-hours-prev">—</div>
+        <div class="wow-curr" id="mom-hours-curr">—</div>
+        <div class="wow-delta" id="mom-hours-delta">—</div>
+      </div>
+      <div class="wow-card">
+        <div class="wow-label">Labour Cost</div>
+        <div class="wow-prev" id="mom-cost-prev">—</div>
+        <div class="wow-curr" id="mom-cost-curr">—</div>
+        <div class="wow-delta" id="mom-cost-delta">—</div>
+      </div>
+      <div class="wow-card">
+        <div class="wow-label">Avg Hourly Rate</div>
+        <div class="wow-prev" id="mom-rate-prev">—</div>
+        <div class="wow-curr" id="mom-rate-curr">—</div>
+        <div class="wow-delta" id="mom-rate-delta">—</div>
+      </div>
+      <div class="wow-card">
+        <div class="wow-label">Avg Employees / Week</div>
+        <div class="wow-prev" id="mom-emps-prev">—</div>
+        <div class="wow-curr" id="mom-emps-curr">—</div>
+        <div class="wow-delta" id="mom-emps-delta">—</div>
+      </div>
+      <div class="wow-card">
+        <div class="wow-label">Avg Weekly Hours</div>
+        <div class="wow-prev" id="mom-avgh-prev">—</div>
+        <div class="wow-curr" id="mom-avgh-curr">—</div>
+        <div class="wow-delta" id="mom-avgh-delta">—</div>
+      </div>
     </div>
   </div>
 
   <!-- FULL SITE TABLE -->
-  <div class="card" style="margin-top:20px">
-    <div class="card-title" id="tableTitle">Site Detail — Week ending Sun 12 Jul 2026 <span>costs from timesheet export</span></div>
+  <div class="card">
+    <div class="card-title" id="tableTitle">Site Detail <span>costs from timesheet export</span></div>
     <div class="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>Site</th>
-            <th>Hours</th>
-            <th>Labour Cost</th>
-            <th>Employees</th>
-            <th>Avg Rate</th>
-            <th>Prev Week Hrs</th>
-            <th>WoW Change</th>
-            <th>Hist Avg Rate</th>
-          </tr>
-        </thead>
+      <table id="siteDetailTable">
+        <thead id="siteTableHead"></thead>
         <tbody id="siteTable"></tbody>
-        <tfoot>
-          <tr id="tableFooter">
-            <td>TOTAL</td>
-            <td id="tf-hours">—</td>
-            <td id="tf-cost">—</td>
-            <td id="tf-emps">—</td>
-            <td id="tf-rate">—</td>
-            <td id="tf-prev">—</td>
-            <td id="tf-wow">—</td>
-            <td id="tf-hist">—</td>
-          </tr>
-        </tfoot>
+        <tfoot id="siteTableFoot"></tfoot>
       </table>
     </div>
   </div>
@@ -280,11 +272,9 @@ tfoot td:first-child { text-align: left; }
 <div class="footer">Northside Electrical &nbsp;·&nbsp; Labour Utilisation &nbsp;·&nbsp; Timesheet data 5 Apr – 12 Jul 2026 &nbsp;·&nbsp; For internal use only</div>
 
 <script>
-// Week labels (week-ending Sunday)
 const weeks = ["5 Apr","12 Apr","19 Apr","26 Apr","3 May","10 May","17 May","24 May","31 May","7 Jun","14 Jun","21 Jun","28 Jun","5 Jul","12 Jul"];
-const W = weeks.length; // 15 weeks
+const W = weeks.length;
 
-// Per-site data arrays (index = week, same order as weeks[])
 const raw = {
   "Aston Craigieburn": {
     h: [252.0,107.5,328.5,302.0,180.0,344.0,285.0,299.0,251.5,256.6,179.0,488.3,391.5,374.0,420.0],
@@ -358,7 +348,7 @@ const siteNames = Object.keys(raw);
 // Helpers
 const $   = id => document.getElementById(id);
 const fC  = n  => '$' + n.toLocaleString('en-AU', {minimumFractionDigits:2, maximumFractionDigits:2});
-const fK  = n  => '$' + (n/1000).toFixed(0) + 'K';
+const fK  = n  => '$' + (n/1000).toFixed(1) + 'K';
 const fH  = n  => n.toLocaleString('en-AU', {minimumFractionDigits:1, maximumFractionDigits:1});
 const fR  = n  => '$' + n.toFixed(2) + '/h';
 const pct = (a,b) => b === 0 ? null : ((a-b)/b*100);
@@ -367,27 +357,37 @@ const pct = (a,b) => b === 0 ? null : ((a-b)/b*100);
 const fleetHours = weeks.map((_,i) => siteNames.reduce((s,k) => s + raw[k].h[i], 0));
 const fleetCost  = weeks.map((_,i) => siteNames.reduce((s,k) => s + raw[k].c[i], 0));
 const fleetEmps  = weeks.map((_,i) => siteNames.reduce((s,k) => s + raw[k].e[i], 0));
-const fleetRate  = weeks.map((_,i) => fleetCost[i] > 0 ? fleetCost[i] / fleetHours[i] : 0);
 
-// Weighted avg rate per site (exclude zero-cost weeks)
+const displayName = k => k === "Northside Electrical Contractors" ? "Admin / Office" : k;
+
+// Month groupings
+const monthGroups = { 'Apr':[0,1,2,3], 'May':[4,5,6,7,8], 'Jun':[9,10,11,12], 'Jul':[13,14] };
+const monthOrder  = ['Apr','May','Jun','Jul'];
+const monthFull   = { 'Apr':'April', 'May':'May', 'Jun':'June', 'Jul':'July' };
+
+// Weighted avg rate per site (all time)
 function siteAvgRate(key) {
   let th = 0, tc = 0;
   raw[key].h.forEach((h,i) => { if (raw[key].c[i] > 0) { th += h; tc += raw[key].c[i]; } });
   return th > 0 ? tc / th : 0;
 }
 
-const displayName = k => k === "Northside Electrical Contractors" ? "Admin / Office" : k;
-
-// Month groupings (indices into weeks[])
-const monthGroups = { 'Apr':[0,1,2,3], 'May':[4,5,6,7,8], 'Jun':[9,10,11,12], 'Jul':[13,14] };
-const monthOrder  = ['Apr','May','Jun','Jul'];
-const monthFull   = { 'Apr':'April', 'May':'May', 'Jun':'June', 'Jul':'July' };
-
-function getActiveMonth() {
-  const m = getMonthFilter();
-  return m !== 'all' ? m : weekMonth[getCurIdx()];
+// ──────────────────────────────────────────────
+// PERIOD SELECTION HELPERS
+// ──────────────────────────────────────────────
+function isMonthMode() { return $('periodSelect').value.startsWith('m:'); }
+function getSelectedMonth() { return $('periodSelect').value.slice(2); }
+function getCurWeekIdx() {
+  if (isMonthMode()) {
+    const idx = monthGroups[getSelectedMonth()];
+    return idx[idx.length - 1];
+  }
+  return parseInt($('periodSelect').value.slice(2), 10);
 }
+function getPrvWeekIdx() { const ci = getCurWeekIdx(); return ci > 0 ? ci - 1 : null; }
+function getSiteKey()    { return $('siteSelect').value; }
 
+// Aggregate totals for a month
 function monthTotals(month, siteKey) {
   const idx = monthGroups[month];
   if (!idx) return null;
@@ -398,50 +398,8 @@ function monthTotals(month, siteKey) {
     c    += isAll ? fleetCost[i]  : raw[siteKey].c[i];
     eSum += isAll ? fleetEmps[i]  : raw[siteKey].e[i];
   });
-  return { h, c, eSum, avgE: eSum / idx.length, avgH: h / idx.length, rate: h > 0 && c > 0 ? c/h : null, weeks: idx.length };
+  return { h, c, eSum, avgE: eSum/idx.length, avgH: h/idx.length, rate: h > 0 && c > 0 ? c/h : null, numWeeks: idx.length };
 }
-
-// Read current selections
-function getCurIdx() { return parseInt($('weekSelect').value, 10); }
-function getPrvIdx() { const ci = getCurIdx(); return ci > 0 ? ci - 1 : null; }
-function getSiteKey() { return $('siteSelect').value; }
-
-// ──────────────────────────────────────────────
-// MONTH GROUPINGS
-// ──────────────────────────────────────────────
-// Each week label ends with a month abbreviation
-const weekMonth = weeks.map(w => w.split(' ')[1]); // ["Apr","Apr",...,"Jul","Jul"]
-
-function getMonthFilter() { return $('monthSelect').value; }
-
-function visibleWeekIndices() {
-  const m = getMonthFilter();
-  return weeks.map((_,i) => i).filter(i => m === 'all' || weekMonth[i] === m);
-}
-
-// ──────────────────────────────────────────────
-// POPULATE / REFRESH WEEK DROPDOWN
-// ──────────────────────────────────────────────
-function populateWeekSelect(keepValue) {
-  const sel = $('weekSelect');
-  const prev = keepValue !== undefined ? keepValue : parseInt(sel.value, 10);
-  sel.innerHTML = '';
-  const visible = visibleWeekIndices();
-  visible.forEach(i => {
-    const opt = document.createElement('option');
-    opt.value = i;
-    opt.textContent = 'Sun ' + weeks[i];
-    sel.appendChild(opt);
-  });
-  // Restore previous selection if still visible, else pick last in range
-  if (visible.includes(prev)) {
-    sel.value = prev;
-  } else {
-    sel.value = visible[visible.length - 1];
-  }
-}
-
-populateWeekSelect(W - 1); // init: default to most recent week
 
 // ──────────────────────────────────────────────
 // SITE COLORS
@@ -470,46 +428,35 @@ let weeklyChart = null;
 function buildWeeklyChart(siteKey) {
   if (weeklyChart) { weeklyChart.destroy(); weeklyChart = null; }
 
-  const cur = getCurIdx();
-  const ctx = $('weeklyChart').getContext('2d');
+  const monthMode = isMonthMode();
+  const curIdx = getCurWeekIdx();
   let fullData, label, color;
 
   if (siteKey === 'all') {
-    fullData = fleetHours;
-    label = 'Fleet Total Hours';
-    color = '#0078d4';
+    fullData = fleetHours; label = 'Fleet Total Hours'; color = '#0078d4';
   } else {
-    fullData = raw[siteKey].h;
-    label = displayName(siteKey);
-    color = siteColors[siteKey] || '#0078d4';
+    fullData = raw[siteKey].h; label = displayName(siteKey); color = siteColors[siteKey] || '#0078d4';
   }
 
-  // Filter to visible weeks for the selected month
-  const vis = visibleWeekIndices();
+  // Month mode: show only that month's weeks. Week mode: show all weeks.
+  const vis = monthMode ? monthGroups[getSelectedMonth()] : weeks.map((_,i) => i);
   const chartLabels = vis.map(i => weeks[i]);
   const chartData   = vis.map(i => fullData[i]);
 
-  const monthFilter = getMonthFilter();
-  const rangeStr = monthFilter === 'all' ? '5 Apr – 12 Jul 2026' :
-    `${weeks[vis[0]]} – ${weeks[vis[vis.length-1]]} 2026`;
   const siteStr = siteKey === 'all' ? 'All Sites (Fleet Total)' : displayName(siteKey);
-  $('weeklyChartTitle').innerHTML = `Weekly Labour Hours — ${siteStr} <span>${rangeStr} · week ending Sunday</span>`;
+  const rangeStr = monthMode
+    ? `${monthFull[getSelectedMonth()]} 2026 · week ending Sunday`
+    : '5 Apr – 12 Jul 2026 · week ending Sunday';
+  $('weeklyChartTitle').innerHTML = `Weekly Labour Hours — ${siteStr} <span>${rangeStr}</span>`;
 
-  const bgColors = chartData.map((_, j) => vis[j] === cur ? color : color + '66');
-  const borders  = chartData.map((_, j) => vis[j] === cur ? color : color + '99');
+  const bgColors = chartData.map((_, j) => vis[j] === curIdx ? color : color + '66');
+  const borders  = chartData.map((_, j) => vis[j] === curIdx ? color : color + '99');
 
-  weeklyChart = new Chart(ctx, {
+  weeklyChart = new Chart($('weeklyChart').getContext('2d'), {
     type: 'bar',
     data: {
       labels: chartLabels,
-      datasets: [{
-        label,
-        data: chartData,
-        backgroundColor: bgColors,
-        borderColor: borders,
-        borderWidth: 1,
-        borderRadius: 3
-      }]
+      datasets: [{ label, data: chartData, backgroundColor: bgColors, borderColor: borders, borderWidth: 1, borderRadius: 3 }]
     },
     options: {
       responsive: true, maintainAspectRatio: false,
@@ -518,23 +465,19 @@ function buildWeeklyChart(siteKey) {
         tooltip: {
           callbacks: {
             label: c => {
-              const i = vis[c.dataIndex]; // map back to original week index
+              const i = vis[c.dataIndex];
               const h = c.raw;
               const cost = siteKey === 'all' ? fleetCost[i] : raw[siteKey].c[i];
               const rate = cost > 0 && h > 0 ? (cost/h).toFixed(2) : '—';
               const e = siteKey === 'all' ? fleetEmps[i] : raw[siteKey].e[i];
-              return [` ${fH(h)} hrs`, cost > 0 ? ` ${fK(cost)} cost` : ' cost pending', ` $${rate}/h avg rate`, ` ${e} employees`];
+              return [` ${fH(h)} hrs`, cost > 0 ? ` ${fK(cost)} cost` : ' cost pending', ` $${rate}/h`, ` ${e} employees`];
             }
           }
         }
       },
       scales: {
         x: { grid: { display: false }, ticks: { font: { size: 10 } } },
-        y: {
-          ticks: { callback: v => v + 'h', font: { size: 10 } },
-          grid: { color: '#f0f0f0' },
-          title: { display: true, text: 'Hours', font: { size: 10 }, color: '#888' }
-        }
+        y: { ticks: { callback: v => v + 'h', font: { size: 10 } }, grid: { color: '#f0f0f0' }, title: { display: true, text: 'Hours', font: { size: 10 }, color: '#888' } }
       }
     }
   });
@@ -544,205 +487,244 @@ function buildWeeklyChart(siteKey) {
 // SITE TABLE
 // ──────────────────────────────────────────────
 function buildTable(filter) {
-  const cur = getCurIdx();
-  const prv = getPrvIdx();
-  const tbody = $('siteTable');
-  tbody.innerHTML = '';
+  const monthMode = isMonthMode();
+  const sites = siteNames.filter(k => filter === 'all' || k === filter);
 
+  if (monthMode) {
+    buildTableMonth(filter, sites);
+  } else {
+    buildTableWeek(filter, sites);
+  }
+}
+
+function buildTableWeek(filter, sites) {
+  const cur = getCurWeekIdx();
+  const prv = getPrvWeekIdx();
   $('tableTitle').innerHTML = `Site Detail — Week ending Sun ${weeks[cur]} 2026 <span>costs from timesheet export</span>`;
+  $('siteTableHead').innerHTML = `<tr><th>Site</th><th>Hours</th><th>Labour Cost</th><th>Employees</th><th>Avg Rate</th><th>Prev Week Hrs</th><th>WoW Change</th><th>Hist Avg Rate</th></tr>`;
 
-  const rows = siteNames
-    .filter(k => filter === 'all' || k === filter)
-    .map(k => {
-      const hCur = raw[k].h[cur], cCur = raw[k].c[cur], eCur = raw[k].e[cur];
-      const hPrv = prv !== null ? raw[k].h[prv] : 0;
-      const cPrv = prv !== null ? raw[k].c[prv] : 0;
-      const rate = hCur > 0 && cCur > 0 ? cCur / hCur : null;
-      const histRate = siteAvgRate(k);
-      const wow = hPrv > 0 ? pct(hCur, hPrv) : null;
-      return { k, hCur, cCur, eCur, hPrv, cPrv, rate, histRate, wow };
-    })
-    .sort((a,b) => b.hCur - a.hCur);
+  const rows = sites.map(k => {
+    const hCur = raw[k].h[cur], cCur = raw[k].c[cur], eCur = raw[k].e[cur];
+    const hPrv = prv !== null ? raw[k].h[prv] : 0;
+    const rate = hCur > 0 && cCur > 0 ? cCur/hCur : null;
+    const wow  = hPrv > 0 ? pct(hCur, hPrv) : null;
+    return { k, hCur, cCur, eCur, hPrv, rate, histRate: siteAvgRate(k), wow };
+  }).sort((a,b) => b.hCur - a.hCur);
 
   let totH = 0, totC = 0, totE = 0, totPrv = 0;
-  rows.forEach(r => {
+  $('siteTable').innerHTML = rows.map(r => {
     totH += r.hCur; totC += r.cCur; totE += r.eCur; totPrv += r.hPrv;
-
     const wowStr = r.wow !== null
-      ? `<span class="${r.wow < 0 ? 'neg-good' : 'pos-bad'}">${r.wow > 0 ? '+' : ''}${r.wow.toFixed(1)}%</span>`
-      : '<span class="cell-zero">—</span>';
-
-    tbody.innerHTML += `<tr data-site="${r.k}">
+      ? `<span style="color:${r.wow < 0 ? '#107c10' : '#d13438'}">${r.wow > 0 ? '+' : ''}${r.wow.toFixed(1)}%</span>`
+      : '<span style="color:#ccc">—</span>';
+    return `<tr data-site="${r.k}">
       <td>${displayName(r.k)}</td>
       <td>${fH(r.hCur)}</td>
-      <td>${r.cCur > 0 ? fC(r.cCur) : '<span class="cell-zero">pending</span>'}</td>
+      <td>${r.cCur > 0 ? fC(r.cCur) : '<span style="color:#ccc">pending</span>'}</td>
       <td>${r.eCur}</td>
-      <td>${r.rate !== null ? fR(r.rate) : '<span class="cell-zero">—</span>'}</td>
-      <td>${r.hPrv > 0 ? fH(r.hPrv) : '<span class="cell-zero">—</span>'}</td>
+      <td>${r.rate !== null ? fR(r.rate) : '<span style="color:#ccc">—</span>'}</td>
+      <td>${r.hPrv > 0 ? fH(r.hPrv) : '<span style="color:#ccc">—</span>'}</td>
       <td>${wowStr}</td>
-      <td>${r.histRate > 0 ? fR(r.histRate) : '<span class="cell-zero">—</span>'}</td>
+      <td>${r.histRate > 0 ? fR(r.histRate) : '<span style="color:#ccc">—</span>'}</td>
     </tr>`;
-  });
+  }).join('');
 
   const totRate = totC > 0 && totH > 0 ? fR(totC/totH) : '—';
-  const totWow  = totPrv > 0 ? ((totH - totPrv)/totPrv*100).toFixed(1) + '%' : '—';
-  const totHistRate = (() => {
-    let th = 0, tc = 0;
-    rows.forEach(r => {
-      raw[r.k].h.forEach((h,i) => { if (raw[r.k].c[i] > 0) { th += h; tc += raw[r.k].c[i]; } });
-    });
-    return th > 0 ? fR(tc/th) : '—';
-  })();
+  const totWow  = totPrv > 0 ? ((totH-totPrv)/totPrv*100).toFixed(1) + '%' : '—';
+  let th2 = 0, tc2 = 0;
+  rows.forEach(r => raw[r.k].h.forEach((h,i) => { if (raw[r.k].c[i] > 0) { th2+=h; tc2+=raw[r.k].c[i]; } }));
+  $('siteTableFoot').innerHTML = `<tr><td>TOTAL</td><td>${fH(totH)}</td><td>${totC > 0 ? fC(totC) : 'pending'}</td><td>${totE}</td><td>${totRate}</td><td>${fH(totPrv)}</td><td>${totWow}</td><td>${th2 > 0 ? fR(tc2/th2) : '—'}</td></tr>`;
+}
 
-  $('tf-hours').textContent = fH(totH);
-  $('tf-cost').textContent  = totC > 0 ? fC(totC) : 'pending';
-  $('tf-emps').textContent  = totE;
-  $('tf-rate').textContent  = totRate;
-  $('tf-prev').textContent  = fH(totPrv);
-  $('tf-wow').textContent   = totWow;
-  $('tf-hist').textContent  = totHistRate;
+function buildTableMonth(filter, sites) {
+  const month = getSelectedMonth();
+  const idx   = monthGroups[month];
+  $('tableTitle').innerHTML = `Site Detail — ${monthFull[month]} 2026 <span>${idx.length} weeks · costs from timesheet export</span>`;
+  $('siteTableHead').innerHTML = `<tr><th>Site</th><th>Total Hours</th><th>Total Cost</th><th>Avg Rate</th><th>Avg Emps / Week</th><th>Avg Weekly Hrs</th></tr>`;
+
+  const rows = sites.map(k => {
+    let h = 0, c = 0, eSum = 0;
+    idx.forEach(i => { h += raw[k].h[i]; c += raw[k].c[i]; eSum += raw[k].e[i]; });
+    return { k, h, c, avgE: eSum/idx.length, avgH: h/idx.length, rate: h > 0 && c > 0 ? c/h : null };
+  }).sort((a,b) => b.h - a.h);
+
+  let totH = 0, totC = 0;
+  $('siteTable').innerHTML = rows.map(r => {
+    totH += r.h; totC += r.c;
+    return `<tr data-site="${r.k}">
+      <td>${displayName(r.k)}</td>
+      <td>${fH(r.h)}</td>
+      <td>${r.c > 0 ? fC(r.c) : '<span style="color:#ccc">pending</span>'}</td>
+      <td>${r.rate !== null ? fR(r.rate) : '<span style="color:#ccc">—</span>'}</td>
+      <td>${r.avgE.toFixed(1)}</td>
+      <td>${fH(r.avgH)}</td>
+    </tr>`;
+  }).join('');
+
+  const totRate = totC > 0 && totH > 0 ? fR(totC/totH) : '—';
+  const totAvgH = totH / idx.length;
+  let totAvgE = 0;
+  rows.forEach(r => totAvgE += r.avgE);
+  $('siteTableFoot').innerHTML = `<tr><td>TOTAL</td><td>${fH(totH)}</td><td>${totC > 0 ? fC(totC) : 'pending'}</td><td>${totRate}</td><td>${totAvgE.toFixed(1)}</td><td>${fH(totAvgH)}</td></tr>`;
 }
 
 // ──────────────────────────────────────────────
-// KPI CARDS + WOW
+// KPI CARDS
 // ──────────────────────────────────────────────
 function updateKpis(siteKey) {
-  const cur = getCurIdx();
-  const prv = getPrvIdx();
+  const monthMode = isMonthMode();
   const isAll = siteKey === 'all';
-  const weekLabel = weeks[cur];
-  const prvLabel  = prv !== null ? weeks[prv] : null;
 
-  const hCur = isAll ? fleetHours[cur] : raw[siteKey].h[cur];
-  const cCur = isAll ? fleetCost[cur]  : raw[siteKey].c[cur];
-  const eCur = isAll ? fleetEmps[cur]  : raw[siteKey].e[cur];
-  const hPrv = prv !== null ? (isAll ? fleetHours[prv] : raw[siteKey].h[prv]) : 0;
-  const cPrv = prv !== null ? (isAll ? fleetCost[prv]  : raw[siteKey].c[prv]) : 0;
-  const ePrv = prv !== null ? (isAll ? fleetEmps[prv]  : raw[siteKey].e[prv]) : 0;
+  if (monthMode) {
+    const month = getSelectedMonth();
+    const prvMonth = monthOrder[monthOrder.indexOf(month) - 1] || null;
+    const cur = monthTotals(month, siteKey);
+    const prv = prvMonth ? monthTotals(prvMonth, siteKey) : null;
+    const momPct = prv && prv.h > 0 ? pct(cur.h, prv.h) : null;
 
-  const rate = hCur > 0 && cCur > 0 ? cCur/hCur : null;
-  const ratePrv = hPrv > 0 && cPrv > 0 ? cPrv/hPrv : null;
-  const wow = hPrv > 0 ? pct(hCur, hPrv) : null;
+    $('headerBadge').textContent = monthFull[month] + ' 2026';
+    $('kpi-hours-label').textContent = 'Total Hours';
+    $('kpi-hours').textContent = fH(cur.h);
+    $('kpi-hours-sub').textContent = (isAll ? 'all sites · ' : displayName(siteKey) + ' · ') + monthFull[month];
+    $('kpi-emps-label').textContent = 'Avg Employees / Week';
+    $('kpi-emps').textContent = cur.avgE.toFixed(1);
+    $('kpi-emps-sub').textContent = 'average per week this month';
+    $('kpi-cost').textContent = cur.c > 0 ? fK(cur.c) : '—';
+    $('kpi-cost-sub').textContent = monthFull[month] + ' total';
+    $('kpi-rate').textContent = cur.rate !== null ? fR(cur.rate) : '—';
+    $('kpi-rate-sub').textContent = 'month avg rate';
+    $('kpi-change-label').textContent = 'MoM Hours Change';
+    $('kpi-wow').textContent = momPct !== null ? (momPct > 0 ? '+' : '') + momPct.toFixed(1) + '%' : '—';
+    $('kpi-wow-sub').textContent = prvMonth ? `vs ${monthFull[prvMonth]}` : 'no prior month';
+  } else {
+    const cur = getCurWeekIdx();
+    const prv = getPrvWeekIdx();
+    const weekLabel = weeks[cur];
+    const prvLabel  = prv !== null ? weeks[prv] : null;
+    const hCur = isAll ? fleetHours[cur] : raw[siteKey].h[cur];
+    const cCur = isAll ? fleetCost[cur]  : raw[siteKey].c[cur];
+    const eCur = isAll ? fleetEmps[cur]  : raw[siteKey].e[cur];
+    const hPrv = prv !== null ? (isAll ? fleetHours[prv] : raw[siteKey].h[prv]) : 0;
+    const cPrv = prv !== null ? (isAll ? fleetCost[prv]  : raw[siteKey].c[prv]) : 0;
+    const ePrv = prv !== null ? (isAll ? fleetEmps[prv]  : raw[siteKey].e[prv]) : 0;
+    const rate = hCur > 0 && cCur > 0 ? cCur/hCur : null;
+    const ratePrv = hPrv > 0 && cPrv > 0 ? cPrv/hPrv : null;
+    const wow = hPrv > 0 ? pct(hCur, hPrv) : null;
 
-  // Update header badge
-  $('headerBadge').textContent = 'Week ending Sun ' + weekLabel + ' 2026';
+    $('headerBadge').textContent = 'Week ending Sun ' + weekLabel + ' 2026';
+    $('kpi-hours-label').textContent = 'Hours (Selected Week)';
+    $('kpi-hours').textContent = fH(hCur);
+    $('kpi-hours-sub').textContent = isAll ? `all sites · week ending ${weekLabel}` : `${displayName(siteKey)} · ${weekLabel}`;
+    $('kpi-emps-label').textContent = 'Employees on Site';
+    $('kpi-emps').textContent = eCur;
+    $('kpi-emps-sub').textContent = 'on timesheets this week';
+    $('kpi-cost').textContent = cCur > 0 ? fK(cCur) : '—';
+    $('kpi-cost-sub').textContent = cCur > 0 ? `week ending ${weekLabel}` : 'cost pending';
+    $('kpi-rate').textContent = rate !== null ? fR(rate) : '—';
+    $('kpi-rate-sub').textContent = 'selected week avg rate';
+    $('kpi-change-label').textContent = 'WoW Hours Change';
+    $('kpi-wow').textContent = wow !== null ? (wow > 0 ? '+' : '') + wow.toFixed(1) + '%' : '—';
+    $('kpi-wow-sub').textContent = prvLabel ? `hours vs week ending ${prvLabel}` : 'no prior week';
 
-  $('kpi-hours').textContent    = fH(hCur);
-  $('kpi-hours-sub').textContent = isAll ? `all sites · week ending ${weekLabel}` : `${displayName(siteKey)} · ${weekLabel}`;
-  $('kpi-emps').textContent     = eCur;
-  $('kpi-emps-sub').textContent = 'on timesheets this week';
-  $('kpi-cost').textContent     = cCur > 0 ? fK(cCur) : '—';
-  $('kpi-cost-sub').textContent = cCur > 0 ? `week ending ${weekLabel}` : 'cost pending';
-  $('kpi-rate').textContent     = rate !== null ? fR(rate) : '—';
-  $('kpi-rate-sub').textContent = 'selected week avg rate';
-  $('kpi-wow').textContent      = wow !== null ? (wow > 0 ? '+' : '') + wow.toFixed(1) + '%' : '—';
-  $('kpi-wow-sub').textContent  = prvLabel ? `hours vs week ending ${prvLabel}` : 'no prior week';
+    // WoW section label
+    const siteLabel = isAll ? '(fleet)' : `(${displayName(siteKey)})`;
+    $('wowSectionLabel').textContent = prvLabel
+      ? ` · week ending ${prvLabel} vs ${weekLabel} ${siteLabel}`
+      : ` · ${weekLabel} ${siteLabel}`;
 
-  // WoW section label
-  const siteLabel = isAll ? '(fleet)' : `(${displayName(siteKey)})`;
-  $('wowSectionLabel').textContent = prvLabel
-    ? ` · week ending ${prvLabel} vs ${weekLabel} ${siteLabel}`
-    : ` · ${weekLabel} ${siteLabel}`;
-
-  function wowCard(prevId, currId, deltaId, prev, curr, isCostGoodDown, unit) {
-    $(prevId).textContent = unit === '$' ? (prev > 0 ? fK(prev) : '—') : (prev > 0 ? fH(prev) : '—');
-    $(currId).textContent = unit === '$' ? (curr > 0 ? fK(curr) : '—') : fH(curr);
-    if (prev > 0) {
-      const d = pct(curr, prev);
-      const cls = isCostGoodDown ? (d < 0 ? 'neg-good' : 'pos-bad') : (d < 0 ? 'neg-bad' : 'pos-good');
-      $(deltaId).className = 'wow-delta ' + cls;
-      $(deltaId).textContent = (d > 0 ? '↑ +' : '↓ ') + d.toFixed(1) + '%';
-    } else {
-      $(deltaId).textContent = '—';
-      $(deltaId).className = 'wow-delta neutral';
+    function wowCard(prevId, currId, deltaId, prev, curr, higherIsGood, fmt) {
+      $(prevId).textContent = prev > 0 ? fmt(prev) : '—';
+      $(currId).textContent = fmt(curr);
+      if (prev > 0) {
+        const d = pct(curr, prev);
+        const cls = higherIsGood ? (d >= 0 ? 'pos-good' : 'neg-bad') : (d >= 0 ? 'pos-bad' : 'neg-good');
+        $(deltaId).className = 'wow-delta ' + cls;
+        $(deltaId).textContent = (d >= 0 ? '↑ +' : '↓ ') + d.toFixed(1) + '%';
+      } else { $(deltaId).textContent = '—'; $(deltaId).className = 'wow-delta neutral'; }
     }
+
+    wowCard('wow-hours-prev','wow-hours-curr','wow-hours-delta', hPrv, hCur, true,  v => fH(v) + ' hrs');
+    wowCard('wow-cost-prev', 'wow-cost-curr', 'wow-cost-delta',  cPrv, cCur, false, v => v > 0 ? fK(v) : '—');
+
+    $('wow-rate-prev').textContent = ratePrv !== null ? fR(ratePrv) : '—';
+    $('wow-rate-curr').textContent = rate    !== null ? fR(rate)    : '—';
+    if (ratePrv !== null && rate !== null) {
+      const rd = pct(rate, ratePrv);
+      $('wow-rate-delta').className = 'wow-delta ' + (rd > 0 ? 'pos-bad' : 'neg-good');
+      $('wow-rate-delta').textContent = (rd > 0 ? '↑ +' : '↓ ') + rd.toFixed(1) + '%';
+    } else { $('wow-rate-delta').textContent = '—'; $('wow-rate-delta').className = 'wow-delta neutral'; }
+
+    $('wow-emps-prev').textContent = ePrv || '—';
+    $('wow-emps-curr').textContent = eCur;
+    if (ePrv > 0) {
+      const ed = pct(eCur, ePrv);
+      $('wow-emps-delta').className = 'wow-delta ' + (ed >= 0 ? 'pos-good' : 'neg-bad');
+      $('wow-emps-delta').textContent = (ed >= 0 ? '↑ +' : '↓ ') + ed.toFixed(1) + '%';
+    } else { $('wow-emps-delta').textContent = '—'; $('wow-emps-delta').className = 'wow-delta neutral'; }
+
+    const hArr = isAll ? fleetHours : raw[siteKey].h;
+    const peakIdx = hArr.indexOf(Math.max(...hArr));
+    $('wow-peak-label').textContent = 'Wk ' + weeks[peakIdx];
+    $('wow-peak-hrs').textContent   = fH(hArr[peakIdx]) + ' hrs';
+    $('wow-peak-sub').textContent   = 'historical peak week';
   }
-
-  wowCard('wow-hours-prev','wow-hours-curr','wow-hours-delta', hPrv, hCur, false, 'h');
-  wowCard('wow-cost-prev', 'wow-cost-curr', 'wow-cost-delta',  cPrv, cCur, true,  '$');
-
-  $('wow-rate-prev').textContent = ratePrv !== null ? fR(ratePrv) : '—';
-  $('wow-rate-curr').textContent = rate    !== null ? fR(rate)    : '—';
-  if (ratePrv !== null && rate !== null) {
-    const rd = pct(rate, ratePrv);
-    $('wow-rate-delta').className = 'wow-delta ' + (rd > 0 ? 'pos-bad' : 'neg-good');
-    $('wow-rate-delta').textContent = (rd > 0 ? '↑ +' : '↓ ') + rd.toFixed(1) + '%';
-  } else { $('wow-rate-delta').textContent = '—'; $('wow-rate-delta').className = 'wow-delta neutral'; }
-
-  $('wow-emps-prev').textContent = ePrv || '—';
-  $('wow-emps-curr').textContent = eCur;
-  if (ePrv > 0) {
-    const ed = pct(eCur, ePrv);
-    $('wow-emps-delta').className = 'wow-delta ' + (ed < 0 ? 'neg-bad' : 'pos-good');
-    $('wow-emps-delta').textContent = (ed > 0 ? '↑ +' : '↓ ') + ed.toFixed(1) + '%';
-  } else { $('wow-emps-delta').textContent = '—'; $('wow-emps-delta').className = 'wow-delta neutral'; }
-
-  // Peak week
-  const hArr = isAll ? fleetHours : raw[siteKey].h;
-  const peakIdx = hArr.indexOf(Math.max(...hArr));
-  $('wow-peak-label').textContent = 'Wk ' + weeks[peakIdx];
-  $('wow-peak-hrs').textContent   = fH(hArr[peakIdx]) + ' hrs';
-  $('wow-peak-sub').textContent   = 'historical peak week';
 }
 
 // ──────────────────────────────────────────────
-// MONTH ON MONTH
+// MONTH ON MONTH CARDS
 // ──────────────────────────────────────────────
 function updateMom(siteKey) {
-  const curMonth = getActiveMonth();
-  const curIdx   = monthOrder.indexOf(curMonth);
+  const month    = isMonthMode() ? getSelectedMonth() : null;
+  if (!month) return;
+  const curIdx   = monthOrder.indexOf(month);
   const prvMonth = curIdx > 0 ? monthOrder[curIdx - 1] : null;
-
-  const cur = monthTotals(curMonth, siteKey);
+  const cur = monthTotals(month, siteKey);
   const prv = prvMonth ? monthTotals(prvMonth, siteKey) : null;
 
   const siteLabel = siteKey === 'all' ? '(fleet)' : `(${displayName(siteKey)})`;
   $('momSectionLabel').textContent = prv
-    ? ` · ${monthFull[prvMonth]} vs ${monthFull[curMonth]} 2026 ${siteLabel}`
-    : ` · ${monthFull[curMonth]} 2026 ${siteLabel} · no prior month`;
+    ? ` · ${monthFull[prvMonth]} vs ${monthFull[month]} 2026 ${siteLabel}`
+    : ` · ${monthFull[month]} 2026 ${siteLabel} · no prior month`;
 
   function momCard(prevId, currId, deltaId, prevVal, currVal, fmt, higherIsGood) {
-    $(prevId).textContent = prevVal !== null ? fmt(prevVal) : '—';
+    $(prevId).textContent = prevVal !== null && prevVal > 0 ? fmt(prevVal) : '—';
     $(currId).textContent = currVal !== null ? fmt(currVal) : '—';
-    if (prevVal !== null && currVal !== null && prevVal > 0) {
+    if (prevVal !== null && prevVal > 0 && currVal !== null) {
       const d = pct(currVal, prevVal);
       const cls = higherIsGood ? (d >= 0 ? 'pos-good' : 'neg-bad') : (d >= 0 ? 'pos-bad' : 'neg-good');
       $(deltaId).className = 'wow-delta ' + cls;
       $(deltaId).textContent = (d >= 0 ? '↑ +' : '↓ ') + d.toFixed(1) + '%';
-    } else {
-      $(deltaId).textContent = '—';
-      $(deltaId).className = 'wow-delta neutral';
-    }
+    } else { $(deltaId).textContent = '—'; $(deltaId).className = 'wow-delta neutral'; }
   }
 
-  momCard('mom-hours-prev','mom-hours-curr','mom-hours-delta',
-    prv ? prv.h    : null, cur.h,    v => fH(v) + ' hrs', true);
-  momCard('mom-cost-prev', 'mom-cost-curr', 'mom-cost-delta',
-    prv ? prv.c    : null, cur.c,    v => '$' + (v/1000).toFixed(1) + 'K', false);
-  momCard('mom-rate-prev', 'mom-rate-curr', 'mom-rate-delta',
-    prv ? prv.rate : null, cur.rate, v => v !== null ? fR(v) : '—', false);
-  momCard('mom-emps-prev', 'mom-emps-curr', 'mom-emps-delta',
-    prv ? prv.avgE : null, cur.avgE, v => v.toFixed(1), true);
-  momCard('mom-avgh-prev', 'mom-avgh-curr', 'mom-avgh-delta',
-    prv ? prv.avgH : null, cur.avgH, v => fH(v) + ' hrs', true);
+  momCard('mom-hours-prev','mom-hours-curr','mom-hours-delta', prv?.h,    cur.h,    v => fH(v) + ' hrs', true);
+  momCard('mom-cost-prev', 'mom-cost-curr', 'mom-cost-delta',  prv?.c,    cur.c,    v => '$' + (v/1000).toFixed(1) + 'K', false);
+  momCard('mom-rate-prev', 'mom-rate-curr', 'mom-rate-delta',  prv?.rate, cur.rate, v => v !== null ? fR(v) : '—', false);
+  momCard('mom-emps-prev', 'mom-emps-curr', 'mom-emps-delta',  prv?.avgE, cur.avgE, v => v.toFixed(1), true);
+  momCard('mom-avgh-prev', 'mom-avgh-curr', 'mom-avgh-delta',  prv?.avgH, cur.avgH, v => fH(v) + ' hrs', true);
 }
 
 // ──────────────────────────────────────────────
-// REBUILD ALL (called by both dropdowns)
+// REBUILD ALL
 // ──────────────────────────────────────────────
 function rebuildAll() {
-  const site = getSiteKey();
-  const isAll = site === 'all';
+  const site      = getSiteKey();
+  const isAll     = site === 'all';
+  const monthMode = isMonthMode();
+
+  // Show/hide WoW and MoM sections
+  $('wowSection').style.display = monthMode ? 'none' : 'block';
+  $('momSection').style.display = monthMode ? 'block' : 'none';
 
   buildWeeklyChart(site);
   buildTable(site);
   updateKpis(site);
-  updateMom(site);
+  if (monthMode) updateMom(site);
 
-  const cur = getCurIdx();
+  const period = monthMode ? monthFull[getSelectedMonth()] + ' 2026' : 'week ending ' + weeks[getCurWeekIdx()];
   $('toolbarMeta').textContent = isAll
-    ? `15 weeks of data · 13 sites · costs from timesheet export`
-    : `${displayName(site)} · week ending ${weeks[cur]}`;
+    ? `15 weeks of data · 13 sites · ${period}`
+    : `${displayName(site)} · ${period}`;
 
   document.querySelectorAll('#siteTable tr').forEach(r => {
     r.classList.toggle('selected-row', !isAll && r.dataset.site === site);
@@ -750,16 +732,12 @@ function rebuildAll() {
 }
 
 // ──────────────────────────────────────────────
-// DROPDOWN HANDLERS
+// HANDLERS
 // ──────────────────────────────────────────────
-function onSiteChange() { rebuildAll(); }
-function onWeekChange() { rebuildAll(); }
-function onMonthChange() {
-  populateWeekSelect(); // refresh week options for this month
-  rebuildAll();
-}
+function onSiteChange()  { rebuildAll(); }
+function onPeriodChange() { rebuildAll(); }
 
-// ── Init ──
+// Init — default is July 2026 (month mode)
 rebuildAll();
 </script>
 </body>

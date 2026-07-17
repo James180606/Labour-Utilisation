@@ -188,7 +188,7 @@ tr.emp-row td { background: #f7faff !important; padding: 6px 12px 10px 24px; bor
       <select id="chartModeSelect" onchange="onChartModeChange()" style="font-size:12px;font-family:'Segoe UI',sans-serif;padding:4px 10px;border:1px solid #ccc;border-radius:4px;background:white;cursor:pointer;margin-left:12px;flex-shrink:0;">
         <option value="weekly">Weekly</option>
         <option value="monthly">Monthly</option>
-        <option value="total">Total (Cumulative)</option>
+        <option value="total">Total</option>
       </select>
     </div>
     <div class="chart-wrap" style="height:320px"><canvas id="weeklyChart"></canvas></div>
@@ -472,19 +472,24 @@ function buildWeeklyChart(siteKey) {
     };
     yLabel = 'Hours';
   } else if (chartMode === 'total') {
-    chartLabels = weeks.slice();
-    let running = 0;
-    chartData = fullData.map(h => { running += h; return running; });
-    bgColors = chartData.map((_, j) => j === chartData.length - 1 ? color : color + '66');
-    borders  = chartData.map((_, j) => j === chartData.length - 1 ? color : color + '99');
-    $('weeklyChartTitle').innerHTML = `Cumulative Labour Hours — ${siteStr} <span>5 Apr – 12 Jul 2026 · running total</span>`;
+    const vis = isMonthMode() ? monthGroups[getSelectedMonth()] : [getCurWeekIdx()];
+    chartLabels = vis.map(i => weeks[i]);
+    chartData   = vis.map(i => fullData[i]);
+    const totalH = chartData.reduce((s, h) => s + h, 0);
+    const totalC = vis.reduce((s, i) => s + fullCost[i], 0);
+    const periodStr = isMonthMode() ? `${monthFull[getSelectedMonth()]} 2026` : `w/e ${weeks[vis[0]]}`;
+    bgColors = chartData.map(() => color);
+    borders  = chartData.map(() => color);
+    $('weeklyChartTitle').innerHTML = `Total Labour Hours — ${siteStr} <span>${periodStr} · ${fH(totalH)} hrs · ${totalC > 0 ? fK(totalC) : 'cost pending'}</span>`;
     tooltipCb = c => {
-      const i = c.dataIndex;
-      const wh = fullData[i];
-      let cumC = 0; for (let j = 0; j <= i; j++) cumC += fullCost[j];
-      return [` Cumulative: ${fH(c.raw)} hrs`, ` This week: ${fH(wh)} hrs`, cumC > 0 ? ` Total cost to date: ${fK(cumC)}` : ''];
+      const i = vis[c.dataIndex];
+      const h = c.raw;
+      const cost = fullCost[i];
+      const rate = cost > 0 && h > 0 ? (cost/h).toFixed(2) : '—';
+      const e = siteKey === 'all' ? fleetEmps[i] : raw[siteKey].e[i];
+      return [` ${fH(h)} hrs`, cost > 0 ? ` ${fK(cost)} cost` : ' cost pending', ` $${rate}/h`, ` ${e} employees`];
     };
-    yLabel = 'Cumulative Hours';
+    yLabel = 'Hours';
   } else {
     // Weekly
     const monthMode = isMonthMode();

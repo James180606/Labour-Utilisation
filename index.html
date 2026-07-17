@@ -475,24 +475,22 @@ function buildWeeklyChart(siteKey) {
     };
     yLabel = 'Hours';
   } else if (chartMode === 'total') {
-    const vis = isAllPeriods() ? weeks.map((_,i) => i) : isMonthMode() ? monthGroups[getSelectedMonth()] : [getCurWeekIdx()];
+    const endIdx = getCurWeekIdx();
+    const vis = weeks.map((_,i) => i).filter(i => i <= endIdx);
     chartLabels = vis.map(i => weeks[i]);
-    chartData   = vis.map(i => fullData[i]);
-    const totalH = chartData.reduce((s, h) => s + h, 0);
-    const totalC = vis.reduce((s, i) => s + fullCost[i], 0);
-    const periodStr = isAllPeriods() ? 'Apr – Jul 2026' : isMonthMode() ? `${monthFull[getSelectedMonth()]} 2026` : `w/e ${weeks[vis[0]]}`;
-    bgColors = chartData.map(() => color);
-    borders  = chartData.map(() => color);
-    $('weeklyChartTitle').innerHTML = `Total Labour Hours — ${siteStr} <span>${periodStr} · ${fH(totalH)} hrs · ${totalC > 0 ? fK(totalC) : 'cost pending'}</span>`;
+    let runH = 0, runC = 0;
+    chartData = vis.map(i => { runH += fullData[i]; return runH; });
+    const cumCost = vis.map(i => { runC += fullCost[i]; return runC; });
+    bgColors = chartData.map((_, j) => j === chartData.length - 1 ? color : color + '66');
+    borders  = chartData.map((_, j) => j === chartData.length - 1 ? color : color + '99');
+    $('weeklyChartTitle').innerHTML = `Cumulative Labour Hours — ${siteStr} <span>5 Apr – ${weeks[endIdx]} 2026 · running total</span>`;
     tooltipCb = c => {
       const i = vis[c.dataIndex];
-      const h = c.raw;
-      const cost = fullCost[i];
-      const rate = cost > 0 && h > 0 ? (cost/h).toFixed(2) : '—';
-      const e = siteKey === 'all' ? fleetEmps[i] : raw[siteKey].e[i];
-      return [` ${fH(h)} hrs`, cost > 0 ? ` ${fK(cost)} cost` : ' cost pending', ` $${rate}/h`, ` ${e} employees`];
+      const wh = fullData[i];
+      const cc = cumCost[c.dataIndex];
+      return [` Cumulative: ${fH(c.raw)} hrs`, ` This week: ${fH(wh)} hrs`, cc > 0 ? ` Cost to date: ${fK(cc)}` : ''];
     };
-    yLabel = 'Hours';
+    yLabel = 'Cumulative Hours';
   } else {
     // Weekly
     const monthMode = isMonthMode();
